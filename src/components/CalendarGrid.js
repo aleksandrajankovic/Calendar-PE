@@ -163,7 +163,7 @@ export default function CalendarGrid({
               ) : !cell.hasPromo || (cell.isFutureForUx && !adminPreview) || !cell.icon ? (
                 <span>🎁</span>
               ) : (
-                <img src={cell.icon} alt="icon" width={70} height={56} loading="lazy" />
+                <img src={cell.icon} alt="icon" width={80} height={56} loading="lazy" />
               )}
             </button>
           );
