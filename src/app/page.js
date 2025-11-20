@@ -25,7 +25,7 @@ function getTextFromTranslations(row, lang) {
   return {
     title: t?.title ?? row.title ?? "",
     button: t?.button ?? row.button ?? "",
-     link: t?.link ?? row.link ?? "#",
+    link: t?.link ?? row.link ?? "#",
     richHtml: t?.richHtml ?? row.richHtml ?? null,
   };
 }
@@ -73,19 +73,26 @@ function getParam(sp, key) {
   return Array.isArray(v) ? v[0] : v;
 }
 
+function getMonthLabel(year, month, lang) {
+  const locale = lang === "pt" ? "pt-BR" : "en-US";
 
+  const raw = new Date(year, month, 1).toLocaleString(locale, {
+    month: "long",
+  });
+
+  return raw.charAt(0).toUpperCase() + raw.slice(1);
+}
 export default async function Home({ searchParams }) {
   const sp = await searchParams;
 
   const cookieStore = await cookies();
-    const adminCookie = cookieStore.get("admin_auth");
+  const adminCookie = cookieStore.get("admin_auth");
   const isAdmin = !!adminCookie?.value;
 
   const now = new Date();
   const yRaw = getParam(sp, "y");
   const mRaw = getParam(sp, "m");
   const langRaw = getParam(sp, "lang");
-
 
   const ALLOWED_LANGS = ["pt", "en"];
   const lang = ALLOWED_LANGS.includes(langRaw) ? langRaw : "pt";
@@ -114,17 +121,19 @@ export default async function Home({ searchParams }) {
   const defaults = normWeeklyRows(weeklyDefaults, lang);
   const planned = normWeeklyRows(weeklyPlanRows, lang);
 
-  const weeklyRaw = Array.from({ length: 7 }, (_, i) =>
-    planned[i] ??
-    defaults[i] ?? {
-      title: "",
-      icon: "",
-      richHtml: null,
-      link: "#",
-      button: "",
-      active: false,
-      buttonColor: "green",
-    }
+  const weeklyRaw = Array.from(
+    { length: 7 },
+    (_, i) =>
+      planned[i] ??
+      defaults[i] ?? {
+        title: "",
+        icon: "",
+        richHtml: null,
+        link: "#",
+        button: "",
+        active: false,
+        buttonColor: "green",
+      }
   );
   const weekly = weeklyRaw;
 
@@ -133,7 +142,7 @@ export default async function Home({ searchParams }) {
 
   const p = prevYM(year, month);
   const n = nextYM(year, month);
-
+  const monthLabel = getMonthLabel(year, month, lang);
   return (
     <main className="max-w-6xl mx-auto p-6 md:p-8">
       <header className="text-center mb-6">
@@ -170,13 +179,6 @@ export default async function Home({ searchParams }) {
             </a>
           ))}
         </div>
-
-        {/* Prethodni / Sledeći – čuvamo i lang u URL-u */}
-        <div className="mt-3 flex items-center justify-center gap-3 text-white/80">
-          <a href={`/?y=${p.y}&m=${p.m}&lang=${lang}`}>◀ Prethodni</a>
-          <span className="opacity-70">|</span>
-          <a href={`/?y=${n.y}&m=${n.m}&lang=${lang}`}>Sledeći ▶</a>
-        </div>
       </header>
 
       <CalendarGrid
@@ -188,6 +190,32 @@ export default async function Home({ searchParams }) {
         lang={lang} // može ti zatrebati u modalu
       />
       <CalendarEnhancer adminPreview={isAdmin} lang={lang} />
+      {/* Month switcher – strelice + mesec/godina */}
+      <div className="mt-4 flex items-center justify-center">
+        <div className="inline-flex items-center gap-4 rounded-full bg-black/40 px-4 py-2 text-white text-sm md:text-base">
+          {/* Prev month */}
+          <a
+            href={`/?y=${p.y}&m=${p.m}&lang=${lang}`}
+            className="p-1 hover:opacity-80"
+            aria-label="Previous month"
+          >
+            ‹
+          </a>
+
+          <span className="min-w-[140px] text-center font-semibold">
+            {monthLabel} <span className="ml-1 opacity-80">{year}</span>
+          </span>
+
+          {/* Next month */}
+          <a
+            href={`/?y=${n.y}&m=${n.m}&lang=${lang}`}
+            className="p-1 hover:opacity-80"
+            aria-label="Next month"
+          >
+            ›
+          </a>
+        </div>
+      </div>
     </main>
   );
 }
