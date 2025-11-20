@@ -1,8 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #05080e;
   --foreground: #171717;
+  --green-primary: #17bb00;
+  --black-white: #2d2d2d;
+  --black-white-80: #404040;
+  --black-white-90: #2D2D2D;
 }
 
 @theme inline {
@@ -18,9 +22,163 @@
     --foreground: #ededed;
   }
 }
-
+@layer utilities {
+  .font-roboto {
+    font-family: var(--font-roboto), system-ui, sans-serif;
+  }
+}
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background-color: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+}
+.tiptap {
+  :first-child {
+    margin-top: 0;
+  }
+
+  /* Heading styles */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    line-height: 1.1;
+    text-wrap: pretty;
+  }
+
+  h1,
+  h2 {
+    margin-bottom: 1.5rem;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+  }
+
+  h2 {
+    font-size: 1.2rem;
+  }
+
+  h3 {
+    font-size: 1.1rem;
+  }
+
+  h4,
+  h5,
+  h6 {
+    font-size: 1rem;
+  }
+
+}
+button {
+  cursor: pointer;
+}
+/* Scope za editor */
+/* Scope za editor */
+.tiptap [data-fs="12"] {
+  font-size: 12px !important;
+}
+.tiptap [data-fs="14"] {
+  font-size: 14px !important;
+}
+.tiptap [data-fs="16"] {
+  font-size: 16px !important;
+}
+.tiptap [data-fs="18"] {
+  font-size: 18px !important;
+}
+.tiptap [data-fs="20"] {
+  font-size: 20px !important;
+}
+.tiptap [data-fs="24"] {
+  font-size: 24px !important;
+}
+.tiptap [data-fs="28"] {
+  font-size: 28px !important;
+}
+.tiptap [data-fs="32"] {
+  font-size: 32px !important;
+}
+
+.tiptap [data-color="red"] {
+  color: #ff0000 !important;
+}
+.tiptap [data-color="green"] {
+  color: #00aa00 !important;
+}
+.tiptap [data-color="blue"] {
+  color: #0066ff !important;
+}
+.prose [data-fs="12"] {
+  font-size: 12px !important;
+}
+.prose [data-fs="14"] {
+  font-size: 14px !important;
+}
+.prose [data-fs="16"] {
+  font-size: 16px !important;
+}
+.prose [data-fs="18"] {
+  font-size: 18px !important;
+}
+.prose [data-fs="20"] {
+  font-size: 20px !important;
+}
+.prose [data-fs="24"] {
+  font-size: 24px !important;
+}
+.prose [data-fs="28"] {
+  font-size: 28px !important;
+}
+.prose [data-fs="32"] {
+  font-size: 32px !important;
+}
+
+.prose [data-color="red"] {
+  color: #ff0000 !important;
+}
+.prose [data-color="green"] {
+  color: #00aa00 !important;
+}
+.prose [data-color="blue"] {
+  color: #0066ff !important;
+}
+.today {
+  outline: 2px solid red;
+  border-radius: 8px;
+}
+.future {
+  opacity: 0.5;
+  pointer-events: none;
+  outline: 2px solid gray;
+}
+.no-click {
+  cursor: not-allowed;
+}
+.modal-backdrop.hidden {
+  display: none !important;
+}
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: grid;
+  place-items: center;
+  z-index: 50;
+}
+.modal-card {
+  background: #0a0a0a;
+  color: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 640px;
+  width: 90%;
+}
+
+/* Admin može da klikne future */
+.admin-preview .future button,
+.admin-preview .future {
+  pointer-events: auto !important;
+  cursor: pointer !important;
 }
