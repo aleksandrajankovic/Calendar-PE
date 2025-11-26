@@ -1,4 +1,3 @@
-// src/app/admin/weekly-plan/useWeeklyPlan.js
 "use client";
 
 import { useEffect, useState } from "react";
@@ -10,7 +9,9 @@ export function useWeeklyPlan(year, month) {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    setLoading(true);
+    //setLoading(true);
+    //setError("");
+
     fetch(`/api/weekly-plan?year=${year}&month=${month}`)
       .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
       .then(setRows)
@@ -27,21 +28,19 @@ export function useWeeklyPlan(year, month) {
         month,
         weekday: payload.weekday,
 
-      
         title: payload.title ?? "",
         button: payload.button ?? "",
         link: payload.link ?? "",
         rich: payload.rich ?? null,
         richHtml: payload.richHtml ?? "",
 
-      
         active: !!payload.active,
         icon: payload.icon ?? "",
         buttonColor: payload.buttonColor ?? "green",
 
-   
         translations: payload.translations || null,
         defaultLang: payload.defaultLang || "pt",
+        category: payload.category || "ALL",
       }),
     });
 
@@ -49,6 +48,7 @@ export function useWeeklyPlan(year, month) {
       toast.error("Greška pri snimanju");
       return;
     }
+
     const saved = await res.json();
     setRows((prev) => {
       const other = prev.filter((r) => r.weekday !== saved.weekday);

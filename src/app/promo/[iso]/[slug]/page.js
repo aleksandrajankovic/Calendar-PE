@@ -7,11 +7,13 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { slugify } from "@/lib/slug";
 
 // ---------- helpers ----------
-function absoluteUrl(path) {
-  const h = headers();
-  const base =
-    process.env.NEXT_PUBLIC_BASE_URL ||
-    `${h.get("x-forwarded-proto") || "http"}://${h.get("host")}`;
+async function absoluteUrl(path) {
+  const h = await headers();      
+
+  const proto = h.get("x-forwarded-proto") ?? "http";
+  const host = h.get("host") ?? "localhost:3000";
+
+  const base = process.env.NEXT_PUBLIC_BASE_URL || `${proto}://${host}`;
   return `${base}${path}`;
 }
 
@@ -50,7 +52,7 @@ async function findPromoByDate(y, m, d) {
 
 // ---------- SEO ----------
 export async function generateMetadata({ params }) {
-  const p = await params; // Next 16: params je Promise
+  const p = await params;
   const parsed = parseISO(p.iso);
   if (!parsed) return {};
 
@@ -66,8 +68,10 @@ export async function generateMetadata({ params }) {
 
   const correctSlug = slugify(promo.title || "promocao");
   const canonicalPath = `/promo/${p.iso}/${correctSlug}`;
-  const url = absoluteUrl(canonicalPath);
-  const image = promo.image ? absoluteUrl(promo.image) : undefined;
+
+  const url = await absoluteUrl(canonicalPath);
+  const image = promo.image ? await absoluteUrl(promo.image) : undefined;
+
   return {
     title,
     description,
@@ -87,6 +91,7 @@ export async function generateMetadata({ params }) {
     },
   };
 }
+
 
 // ---------- PAGE (SSR) ----------
 export default async function PromoDetailPage({ params }) {

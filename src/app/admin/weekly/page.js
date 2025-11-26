@@ -36,6 +36,7 @@ export default function GlobalWeeklyPage() {
         richHtml: [],
         active: true,
         buttonColor: "green",
+        category: "ALL",
       }
     );
   }, [editingDay, rows]);
@@ -43,7 +44,6 @@ export default function GlobalWeeklyPage() {
   const rowGrid =
     "grid grid-cols-1 sm:grid-cols-[120px_1fr] " +
     "lg:grid-cols-[120px_1fr_1.5fr_120px_120px_160px]";
-
 
   return (
     <>
@@ -164,7 +164,9 @@ export default function GlobalWeeklyPage() {
                       <button
                         className="inline-flex items-center justify-center h-8 w-8 rounded-md bg-[#5F5F5F] hover:brightness-110"
                         onClick={() =>
-                          confirmDeleteToast(r.title || LABELS[wd], () => remove(wd))
+                          confirmDeleteToast(r.title || LABELS[wd], () =>
+                            remove(wd)
+                          )
                         }
                         aria-label="Delete"
                       >

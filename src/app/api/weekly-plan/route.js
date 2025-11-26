@@ -73,6 +73,7 @@ export async function PUT(req) {
 
     translations: rawTranslations,
     defaultLang,
+    category,
   } = body;
 
   const translations = rawTranslations || {};
@@ -95,6 +96,7 @@ export async function PUT(req) {
     buttonColor: buttonColor || "green",
 
     translations: Object.keys(translations).length ? translations : null,
+    category: category || "ALL",
   };
 
   const row = await prisma.weeklyPlan.upsert({

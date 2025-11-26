@@ -84,9 +84,10 @@ export default function SpecialsAdminPage() {
     }
   }
 
+  // lg: date | title | category | link | status | toggle | actions
   const rowGrid =
     "grid grid-cols-1 sm:grid-cols-[140px_1fr] " +
-    "lg:grid-cols-[140px_1fr_1.5fr_120px_120px_160px]";
+    "lg:grid-cols-[140px_1fr_120px_1.5fr_120px_120px_160px]"; // 👈 dodata kolona za kategoriju
 
   return (
     <>
@@ -96,7 +97,9 @@ export default function SpecialsAdminPage() {
           <h1 className="text-xl font-semibold">
             Backoffice - Special Promotions
           </h1>
-          <p className="text-sm text-neutral-500">Review and manage special promotions for the selected date</p>
+          <p className="text-sm text-neutral-500">
+            Review and manage special promotions for the selected date
+          </p>
         </div>
 
         <button
@@ -131,6 +134,7 @@ export default function SpecialsAdminPage() {
         columns={[
           { key: "date", label: "Date", width: "140px" },
           { key: "title", label: "Title" },
+          { key: "category", label: "Category", width: "120px" }, // 👈 NOVO
           { key: "link", label: "Link", width: "1.5fr" },
           { key: "status", label: "Status", width: "120px" },
           { key: "toggle", label: "Toggle", width: "120px" },
@@ -169,6 +173,11 @@ export default function SpecialsAdminPage() {
                     {/* Title */}
                     <div className="font-semibold text-sm text-[var(--black-white-90)]">
                       {r.title || "—"}
+                    </div>
+
+                    {/* Category – NOVO */}
+                    <div className="text-xs text-neutral-600 uppercase tracking-wide">
+                      {r.category || "ALL"}
                     </div>
 
                     {/* Link */}

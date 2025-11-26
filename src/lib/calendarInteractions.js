@@ -1,86 +1,173 @@
 // lib/calendarInteractions.js
-function renderModalHTML(entry) {
-  const { promo, day, shareUrl } = entry;
-  if (!promo) return "<p>Sem promoções neste dia.</p>";
 
-  const openUrl = promo.link && String(promo.link);
-  const canOpen = openUrl && openUrl !== "#";
-  if (entry.shareUrl) {
-    history.pushState({ promo: true }, "", entry.shareUrl);
+// -----------------------------
+// RENDER MODALA
+// -----------------------------
+function renderModalHTML(entry, lang = "pt") {
+  if (!entry) {
+    return lang === "pt"
+      ? "<p>Sem promoções neste dia.</p>"
+      : "<p>No promotions for this day.</p>";
   }
-  const color = promo.buttonColor || "green";
 
-  const BUTTON_COLOR_CLASSES = {
-    green:
-      "inline-block px-4 py-2 rounded-md mt-4 bg-[#17BB00] text-white font-condensed text-xs uppercase hover:brightness-110",
-    yellow:
-      "inline-block px-4 py-2 rounded-md mt-4 bg-[#FFCB05] text-black font-condensed text-xs uppercase hover:brightness-110",
-  };
+  const { promo, day, type } = entry;
 
-  const btnClass = BUTTON_COLOR_CLASSES[color] || BUTTON_COLOR_CLASSES.green;
-  if (promo.richHtml) {
-    return `
-      <header class="mb-2">
-        <p class="text-xs text-white/60">${String(day).padStart(2, "0")}</p>
-        <h2 class="text-xl font-semibold">${promo.title || ""}</h2>
-      </header>
-      <div class="prose prose-invert max-w-none
-        [&_ul]:list-inside [&_ol]:list-inside
-        [&_ul]:pl-0 [&_ol]:pl-0
-        [&_li_p]:m-0 [&_li_p]:inline">
-        ${promo.richHtml}
+  // koristimo top-level vrednosti, pa ako nema, padamo na promo.*
+  const title = entry.title || (promo && promo.title) || "";
+  const button = entry.button || (promo && promo.button) || "";
+  const buttonColor =
+    entry.buttonColor || (promo && promo.buttonColor) || "green";
+  const link = entry.link || (promo && promo.link) || "";
+  const richHtml = entry.richHtml || (promo && promo.richHtml) || "";
+
+  // ako baš nemamo nikakav sadržaj
+  if (!promo && !richHtml) {
+    return lang === "pt"
+      ? "<p>Sem promoções neste dia.</p>"
+      : "<p>No promotions for this day.</p>";
+  }
+
+  // --- izvlačenje prve <img> iz richHtml ---
+  let imageHtml = null;
+  let contentHtml = richHtml;
+
+  if (contentHtml) {
+    const imgMatch = contentHtml.match(/<img[^>]*>/i);
+    if (imgMatch) {
+      imageHtml = imgMatch[0];
+      contentHtml = contentHtml.replace(imgMatch[0], "");
+    }
+  }
+
+  // --- kategorija (žuti label) ---
+  let categoryLabel;
+  if (type === "special") {
+    categoryLabel =
+      lang === "pt" ? "Promoção especial" : "Special promotion";
+  } else {
+    categoryLabel =
+      lang === "pt" ? "Promoção semanal" : "Weekly promotion";
+  }
+
+  // --- button ---
+  const openUrl = link && String(link);
+  const canOpen = openUrl && openUrl !== "#";
+
+  const isYellow = buttonColor === "yellow";
+
+  const defaultButtonLabel =
+    button ||
+    (lang === "pt" ? "Registrar-se" : "Register");
+
+  // --- HTML struktura: slika → title → žuti label → opis → dugme ---
+  return `
+    <div class="flex flex-col w-full max-w-[420px] mx-auto">
+      ${
+        imageHtml
+          ? `
+        <div class="mb-4 [&_img]:w-full [&_img]:h-auto [&_img]:rounded-2xl">
+          ${imageHtml}
+        </div>`
+          : ""
+      }
+
+      <h2 class="font-bold text-[24px] md:text-[28px] leading-tight mb-2 text-center">
+        ${title}
+      </h2>
+
+      <div class="text-[11px] uppercase tracking-[0.12em] text-[#FACC01] mb-3 text-center">
+        ${categoryLabel}
       </div>
+
+      ${
+        contentHtml
+          ? `
+        <div class="
+          text-sm leading-relaxed text-white/90
+          [&_p]:mb-2 [&_p:last-child]:mb-0
+          [&_strong]:font-semibold
+          [&_ul]:list-disc [&_ul]:pl-5
+        ">
+          ${contentHtml}
+        </div>`
+          : ""
+      }
+
       ${
         canOpen
           ? `
-        <a class="${btnClass}" href="${openUrl}" target="_blank" rel="noreferrer">
-          ${promo.button || "Registrate"}
-        </a>`
+        <div class="pt-5 mt-2 flex justify-center">
+          <a
+            href="${openUrl}"
+            target="_blank"
+            rel="noreferrer"
+            class="
+              w-4/5 max-w-[360px]
+              inline-flex items-center justify-center
+              px-4 py-3
+              rounded-[10px]
+              text-sm font-semibold font-condensed
+              shadow-[0_10px_25px_rgba(0,0,0,0.6)]
+              transition
+              ${
+                isYellow
+                  ? "bg-[#FACC01] text-black hover:brightness-110"
+                  : "bg-[#17BB00] text-white hover:brightness-110"
+              }
+            "
+          >
+            ${defaultButtonLabel}
+          </a>
+        </div>`
           : ""
       }
-    `;
-  }
+    </div>
+  `;
 }
 
+// -----------------------------
+// INIT FUNKCIJA
+// -----------------------------
 export function initCalendarInteractions(rootSelector = "#calendar-root") {
   const root = document.querySelector(rootSelector);
   if (!root) return;
 
   const dataEl = root.querySelector("#calendar-data");
   if (!dataEl) return;
+
   const payload = JSON.parse(dataEl.textContent || "{}");
   const days = Array.isArray(payload.days) ? payload.days : [];
+  const lang = payload.lang || "pt";
 
   const modal = root.querySelector("#promo-modal");
   const content = root.querySelector("#promo-content");
   const closeBtn = root.querySelector("#promo-close");
 
+  if (!modal || !content) return;
+
   let isOpen = false;
+  let previousUrl = null;
 
   function openModal(entry) {
-    if (!modal || !content) return;
-    content.innerHTML = renderModalHTML(entry);
+    content.innerHTML = renderModalHTML(entry, lang);
     modal.classList.remove("hidden");
     document.body.style.overflow = "hidden";
     isOpen = true;
 
-    // 💡 NOVO: guramo shareUrl u istoriju
-    if (entry.shareUrl) {
+    previousUrl = window.location.href;
+
+    if (entry && entry.shareUrl) {
       history.pushState({ promo: true }, "", entry.shareUrl);
     }
   }
 
-  function closeModal({ replace } = {}) {
-    if (!modal) return;
+  function closeModal({ fromPopstate = false } = {}) {
     modal.classList.add("hidden");
     document.body.style.overflow = "";
     isOpen = false;
 
-    // 💡 NOVO: vraćamo URL
-    if (replace) {
-      history.replaceState(null, "", "/");
-    } else {
-      history.replaceState(null, "", "/");
+    if (!fromPopstate && previousUrl) {
+      history.replaceState(null, "", previousUrl);
     }
   }
 
@@ -88,31 +175,41 @@ export function initCalendarInteractions(rootSelector = "#calendar-root") {
   root.addEventListener("click", (e) => {
     const btn = e.target.closest("[data-day-button]");
     if (!btn) return;
+
     const day = Number(btn.getAttribute("data-day"));
     const entry = days.find((d) => d.day === day);
-    if (!entry || !entry.promo) return;
+
+    if (!entry) return;
+
     openModal(entry);
   });
 
-  // Zatvaranje
-  closeBtn?.addEventListener("click", () => closeModal({ replace: true }));
-  modal?.addEventListener("click", (e) => {
-    if (e.target === modal) return closeModal({ replace: true });
-    if (e.target.id === "promo-close" || e.target.closest("#promo-close")) {
-      e.preventDefault();
-      return closeModal({ replace: true });
+  // Zatvaranje – X dugme
+  closeBtn?.addEventListener("click", (e) => {
+    e.preventDefault();
+    closeModal();
+  });
+
+  // Klik na overlay
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      closeModal();
     }
   });
 
+  // ESC
   window.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && isOpen) closeModal({ replace: true });
+    if (e.key === "Escape" && isOpen) {
+      closeModal();
+    }
   });
 
-  // 💡 NOVO: podrži Back/Forward (zatvori modal kad user klikne Back)
+  // Back/forward u browseru
   window.addEventListener("popstate", () => {
     if (isOpen) {
-      // korisnik stisnuo Back dok je modal otvoren
-      closeModal({ replace: false });
+      closeModal({ fromPopstate: true });
     }
   });
 }
+
+export default initCalendarInteractions;

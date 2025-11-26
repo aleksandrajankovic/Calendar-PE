@@ -6,7 +6,17 @@ datasource db {
 generator client {
   provider = "prisma-client-js"
 }
-
+enum PromoCategory {
+  SPORT
+  CASINO
+  MISSIONS
+  ALL
+}
+model CalendarSettings {
+  id         Int      @id
+  bgImageUrl String? 
+  updatedAt  DateTime @updatedAt
+}
 model WeeklyPromotion {
   id           Int      @id @default(autoincrement())
   weekday      Int
@@ -20,7 +30,7 @@ model WeeklyPromotion {
   richHtml     String?
 
   translations Json?
-
+category     PromoCategory @default(ALL)
   @@unique([weekday])
 }
 
@@ -39,6 +49,7 @@ model SpecialPromotion {
   richHtml     String?
 
   translations Json?
+  category     PromoCategory @default(ALL)
 }
 
 model WeeklyPlan {
@@ -56,7 +67,7 @@ model WeeklyPlan {
   buttonColor String   @default("green")
 
   translations Json?
-
+category     PromoCategory @default(ALL)
   @@unique([year, month, weekday])
 }
 

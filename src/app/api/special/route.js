@@ -48,15 +48,14 @@ export async function POST(req) {
     buttonColor,
     active,
 
-    // fallback
     title,
     button,
     rich,
     richHtml,
 
-    // multi-lang
     translations: rawTranslations,
     defaultLang,
+    category,
   } = body;
 
   const translations = rawTranslations || {};
@@ -89,6 +88,7 @@ export async function POST(req) {
       buttonColor: buttonColor || "green",
 
       translations: Object.keys(translations).length ? translations : null,
+      category: category || "ALL",
     },
   });
 

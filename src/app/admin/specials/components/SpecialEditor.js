@@ -2,11 +2,20 @@
 import { useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import RichEditor from "@/components/RichEditor";
+import ImageGalleryModal from "../../components/ImageGalleryModal";
 
 // jezici za tabove
 const LANGS = [
   { code: "pt", label: "Portuguese" },
   { code: "en", label: "English" },
+];
+
+// kategorije za promo
+const CATEGORIES = [
+  { value: "SPORT", label: "Sport" },
+  { value: "CASINO", label: "Casino" },
+  { value: "MISSIONS", label: "Missions" },
+  { value: "ALL", label: "All" },
 ];
 
 // yyyy-mm-dd ⇄ {year, month(0-11), day}
@@ -30,7 +39,7 @@ export default function SpecialEditor({ initial, onCancel, onSaved }) {
     const d = initial?.day ?? now.getDate();
 
     const baseTranslations = initial?.translations || {};
-    const mainLang = LANGS[0].code; // npr. "en"
+    const mainLang = LANGS[0].code; // "pt"
 
     if (!baseTranslations[mainLang]) {
       baseTranslations[mainLang] = {
@@ -51,15 +60,19 @@ export default function SpecialEditor({ initial, onCancel, onSaved }) {
 
       icon: initial?.icon ?? "",
       active: initial?.active ?? true,
-      buttonColor: initial?.buttonColor ?? "",
+      buttonColor: initial?.buttonColor ?? "green",
 
       translations: baseTranslations,
+
+      // NOVO: category
+      category: initial?.category || "ALL",
     };
   }, [initial]);
 
   const [form, setForm] = useState(seed);
   const [saving, setSaving] = useState(false);
   const [activeLang, setActiveLang] = useState(LANGS[0].code);
+  const [showIconGallery, setShowIconGallery] = useState(false);
 
   const set = (k, v) => setForm((prev) => ({ ...prev, [k]: v }));
 
@@ -86,7 +99,7 @@ export default function SpecialEditor({ initial, onCancel, onSaved }) {
       typeof form.month === "number" ? form.month : new Date().getMonth();
 
     const url = `/?y=${y}&m=${m}`;
-    window.open(url, "_blank", "noopener,noreferrer"); 
+    window.open(url, "_blank", "noopener,noreferrer");
   }
 
   async function save() {
@@ -120,6 +133,7 @@ export default function SpecialEditor({ initial, onCancel, onSaved }) {
       const translations = form.translations || {};
       const mainT = translations[activeLang] || {};
       const mainLink = mainT.link || form.link || "";
+
       const payload = {
         year: form.year,
         month: form.month,
@@ -129,17 +143,16 @@ export default function SpecialEditor({ initial, onCancel, onSaved }) {
         link: mainLink,
 
         active: !!form.active,
-        buttonColor: form.buttonColor || "",
+        buttonColor: form.buttonColor || "green",
 
-  
         translations,
         defaultLang: activeLang,
-
 
         title: mainT.title || "",
         button: mainT.button || "",
         rich: mainT.rich || null,
         richHtml: mainT.richHtml || "",
+        category: form.category || "ALL",
       };
 
       const res = await fetch(url, {
@@ -265,9 +278,8 @@ export default function SpecialEditor({ initial, onCancel, onSaved }) {
           </label>
         </div>
 
-        {/* Form polja */}
+        {/* Title + Date */}
         <div className="grid md:grid-cols-2 gap-4 text-neutral-800">
-          {/* Title (po jeziku) */}
           <label className="block">
             <span className="text-sm mb-1 inline-block">
               Title ({activeLang.toUpperCase()})
@@ -281,7 +293,6 @@ export default function SpecialEditor({ initial, onCancel, onSaved }) {
             />
           </label>
 
-          {/* Date from */}
           <label className="block">
             <span className="text-sm mb-1 inline-block">Date from</span>
             <input
@@ -309,7 +320,6 @@ export default function SpecialEditor({ initial, onCancel, onSaved }) {
 
         {/* Button label + Button link + Button Color */}
         <div className="grid gap-4 md:grid-cols-[minmax(0,1.5fr)_minmax(0,2fr)_auto] items-end">
-          {/* Button label (po jeziku) */}
           <label className="block text-sm text-neutral-800">
             <span className="mb-1 inline-block">
               Button label ({activeLang.toUpperCase()})
@@ -323,7 +333,6 @@ export default function SpecialEditor({ initial, onCancel, onSaved }) {
             />
           </label>
 
-          {/* Button link (globalno) */}
           <label className="block text-sm text-neutral-800">
             <span className="mb-1 inline-block">
               Button link ({activeLang.toUpperCase()})
@@ -338,13 +347,12 @@ export default function SpecialEditor({ initial, onCancel, onSaved }) {
             />
           </label>
 
-          {/* Button Color desno */}
+          {/* Button Color */}
           <div className="flex flex-col items-start md:items-end w-full md:w-auto">
             <span className="mb-1 inline-block text-sm text-neutral-800">
               Button Color
             </span>
             <div className="flex items-center gap-2">
-              {/* Žuta */}
               <button
                 type="button"
                 onClick={() => set("buttonColor", "yellow")}
@@ -361,7 +369,6 @@ export default function SpecialEditor({ initial, onCancel, onSaved }) {
                 </span>
               </button>
 
-              {/* Zelena */}
               <button
                 type="button"
                 onClick={() => set("buttonColor", "green")}
@@ -383,43 +390,53 @@ export default function SpecialEditor({ initial, onCancel, onSaved }) {
           </div>
         </div>
 
-        {/* Upload icon */}
+        {/* Category selector */}
+        <div className="mt-2">
+          <span className="mb-1 inline-block text-sm text-neutral-800">
+            Category
+          </span>
+          <div className="flex flex-wrap gap-2">
+            {CATEGORIES.map((cat) => {
+              const selected = form.category === cat.value;
+              return (
+                <button
+                  key={cat.value}
+                  type="button"
+                  onClick={() => set("category", cat.value)}
+                  className={
+                    "px-3 py-1 rounded-full text-[11px] font-medium border transition " +
+                    (selected
+                      ? "bg-[#17BB00] text-white border-[#17BB00]"
+                      : "bg-white text-neutral-700 border-neutral-300 hover:bg-neutral-100")
+                  }
+                >
+                  {cat.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Icon */}
         <div className="mt-3">
           <label className="block text-sm text-neutral-800">
-            <span className="mb-1 inline-block">Upload icon</span>
+            <span className="mb-1 inline-block">Icon</span>
+
             <div className="flex flex-wrap items-center gap-3">
               <input
                 className="flex-1 min-w-0 border border-[#D0D0D0] rounded px-2.5 py-1.5 text-sm"
                 value={form.icon || ""}
                 onChange={(e) => set("icon", e.target.value)}
-                placeholder="linktotheimage.jpg"
+                placeholder="/uploads/promo-icon.webp"
               />
 
-              <label className="shrink-0 font-condensed inline-flex items-center justify-center w-[110px] px-4 py-[10px] rounded bg-[#4A4A4A] text-white text-xs font-medium cursor-pointer hover:brightness-110 whitespace-nowrap">
-                Choose File
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={async (e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
-                    const fd = new FormData();
-                    fd.append("file", file);
-                    try {
-                      const res = await fetch("/api/upload", {
-                        method: "POST",
-                        body: fd,
-                      });
-                      if (!res.ok) throw new Error(await res.text());
-                      const { url } = await res.json();
-                      set("icon", url);
-                    } catch (err) {
-                      alert("Upload nije uspeo");
-                    }
-                  }}
-                />
-              </label>
+              <button
+                type="button"
+                onClick={() => setShowIconGallery(true)}
+                className="shrink-0 font-condensed inline-flex items-center justify-center px-4 py-[10px] rounded bg-[#1F2933] text-white text-xs hover:brightness-110 whitespace-nowrap"
+              >
+                Choose from gallery
+              </button>
             </div>
 
             {form.icon && (
@@ -427,7 +444,7 @@ export default function SpecialEditor({ initial, onCancel, onSaved }) {
                 <img
                   src={form.icon}
                   alt="icon preview"
-                  className="w-8 h-8 object-contain border border-neutral-200 rounded"
+                  className="w-8 h-8 object-contain border border-neutral-200 rounded bg-white"
                 />
                 <code className="text-xs text-neutral-500 break-all">
                   {form.icon}
@@ -437,6 +454,17 @@ export default function SpecialEditor({ initial, onCancel, onSaved }) {
           </label>
         </div>
 
+        {/* Gallery modal */}
+        {showIconGallery && (
+          <ImageGalleryModal
+            onSelect={(url) => {
+              set("icon", url);
+              setShowIconGallery(false);
+            }}
+            onClose={() => setShowIconGallery(false)}
+          />
+        )}
+
         {/* Rich text editor */}
         <div>
           <span className="text-sm text-neutral-800 block mb-1.5">
@@ -444,7 +472,7 @@ export default function SpecialEditor({ initial, onCancel, onSaved }) {
           </span>
           <div className="border border-[#D0D0D0] rounded">
             <RichEditor
-              key={activeLang} // 🔹 remount da bi promenio jezik
+              key={activeLang}
               initialJSON={currentT.rich || null}
               onChange={({ json, html }) => {
                 setTranslationField(activeLang, "rich", json);

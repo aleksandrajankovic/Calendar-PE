@@ -55,6 +55,7 @@ export default function WeeklyPlanAdmin() {
         rich: null,
         richHtml: null,
         buttonColor: "green",
+        category: "ALL",
       }
     );
   }, [editing, rows, year, month]);

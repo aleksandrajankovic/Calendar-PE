@@ -1,10 +1,9 @@
-// app/admin/weekly/components/WeeklyEditor.jsx
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import RichEditor from "@/components/RichEditor";
-import { BUTTON_COLORS } from "../../lib/buttonColors";
+import ImageGalleryModal from "../../components/ImageGalleryModal";
 
 const LABELS = [
   "Monday",
@@ -22,12 +21,19 @@ const LANGS = [
   { code: "en", label: "English" },
 ];
 
+// kategorije za promo
+const CATEGORIES = [
+  { value: "SPORT", label: "Sport" },
+  { value: "CASINO", label: "Casino" },
+  { value: "MISSIONS", label: "Missions" },
+  { value: "ALL", label: "All" },
+];
+
 export default function WeeklyEditor({ initial, onCancel, onSave }) {
   const seed = useMemo(() => {
     const baseTranslations = initial?.translations || {};
-    const mainLang = LANGS[0].code; // "en"
+    const mainLang = LANGS[0].code; // "pt"
 
-    // ako nema entry za glavni jezik, napuni ga iz starih polja
     if (!baseTranslations[mainLang]) {
       baseTranslations[mainLang] = {
         title: initial?.title ?? "",
@@ -42,12 +48,14 @@ export default function WeeklyEditor({ initial, onCancel, onSave }) {
       ...initial,
       translations: baseTranslations,
       buttonColor: initial?.buttonColor || "green",
+      category: initial?.category || "ALL",
     };
   }, [initial]);
 
   const [form, setForm] = useState(seed);
   const [saving, setSaving] = useState(false);
-  const [activeLang, setActiveLang] = useState(LANGS[0].code); // "en"
+  const [activeLang, setActiveLang] = useState(LANGS[0].code);
+  const [showIconGallery, setShowIconGallery] = useState(false);
 
   useEffect(() => {
     setForm(seed);
@@ -109,19 +117,19 @@ export default function WeeklyEditor({ initial, onCancel, onSave }) {
         translations,
         defaultLang: activeLang,
 
-        // fallback polja za kompatibilnost sa BE
         title: mainT.title || "",
         button: mainT.button || "",
         link: mainLink,
         rich: mainT.rich || null,
         richHtml: mainT.richHtml || "",
 
-        // ostalo
         subtitle: form.subtitle ?? "",
         image: form.image ?? "",
         icon: form.icon ?? "",
         active: !!form.active,
         buttonColor: form.buttonColor ?? "green",
+
+        category: form.category || "ALL",
       });
 
       toast.success("Saved.");
@@ -295,10 +303,11 @@ export default function WeeklyEditor({ initial, onCancel, onSave }) {
               <button
                 type="button"
                 onClick={() => setField("buttonColor", "yellow")}
-                className={`h-7 w-7 rounded-full flex items-center justify-center border transition
-        ${
-          form.buttonColor === "yellow" ? "border-black" : "border-transparent"
-        }`}
+                className={`h-7 w-7 rounded-full flex items-center justify-center border transition ${
+                  form.buttonColor === "yellow"
+                    ? "border-black"
+                    : "border-transparent"
+                }`}
               >
                 <span className="h-6 w-6 rounded-full bg-[#FFCB05] flex items-center justify-center">
                   {form.buttonColor === "yellow" && (
@@ -313,10 +322,11 @@ export default function WeeklyEditor({ initial, onCancel, onSave }) {
               <button
                 type="button"
                 onClick={() => setField("buttonColor", "green")}
-                className={`h-7 w-7 rounded-full flex items-center justify-center border transition
-        ${
-          form.buttonColor === "green" ? "border-black" : "border-transparent"
-        }`}
+                className={`h-7 w-7 rounded-full flex items-center justify-center border transition ${
+                  form.buttonColor === "green"
+                    ? "border-black"
+                    : "border-transparent"
+                }`}
               >
                 <span className="h-6 w-6 rounded-full bg-[#31A62E] flex items-center justify-center">
                   {form.buttonColor === "green" && (
@@ -330,55 +340,82 @@ export default function WeeklyEditor({ initial, onCancel, onSave }) {
           </div>
         </div>
 
-        {/* Icon URL + Choose file u jednom redu */}
-        <div className="text-sm text-neutral-800">
-          <span className="mb-1 inline-block">Upload icon</span>
-
-          <div className="flex items-center gap-3">
-            <input
-              className="flex-1 min-w-0 border border-[#D0D0D0] rounded px-2.5 py-1.5 text-sm"
-              value={form.icon || ""}
-              onChange={(e) => setField("icon", e.target.value)}
-              placeholder="/uploads/icon.webp"
-            />
-
-            <label className="shrink-0 font-condensed inline-flex items-center justify-center w-[105px] p-[10px] rounded  bg-[#4A4A4A] text-white text-xs font-medium cursor-pointer hover:brightness-110 whitespace-nowrap">
-              Choose File
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={async (e) => {
-                  const file = e.target.files?.[0];
-                  if (!file) return;
-                  const fd = new FormData();
-                  fd.append("file", file);
-                  try {
-                    const res = await fetch("/api/upload", {
-                      method: "POST",
-                      body: fd,
-                    });
-                    if (!res.ok) throw new Error(await res.text());
-                    const { url } = await res.json();
-                    setField("icon", url);
-                  } catch (err) {
-                    alert("Upload nije uspeo");
+        {/* Category selector */}
+        <div className="mt-2">
+          <span className="mb-1 inline-block text-sm text-neutral-800">
+            Category
+          </span>
+          <div className="flex flex-wrap gap-2">
+            {CATEGORIES.map((cat) => {
+              const selected = form.category === cat.value;
+              return (
+                <button
+                  key={cat.value}
+                  type="button"
+                  onClick={() => setField("category", cat.value)}
+                  className={
+                    "px-3 py-1 rounded-full text-[11px] font-medium border transition " +
+                    (selected
+                      ? "bg-[#17BB00] text-white border-[#17BB00]"
+                      : "bg-white text-neutral-700 border-neutral-300 hover:bg-neutral-100")
                   }
-                }}
+                >
+                  {cat.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Icon URL + Choose file u jednom redu */}
+        <div className="mt-3">
+          <label className="block text-sm text-neutral-800">
+            <span className="mb-1 inline-block">Icon</span>
+
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Ručni unos / URL */}
+              <input
+                className="flex-1 min-w-0 border border-[#D0D0D0] rounded px-2.5 py-1.5 text-sm"
+                value={form.icon || ""}
+                onChange={(e) => setField("icon", e.target.value)}
+                placeholder="/uploads/promo-icon.webp"
               />
-            </label>
+
+              {/* Dugme za galeriju */}
+              <button
+                type="button"
+                onClick={() => setShowIconGallery(true)}
+                className="shrink-0 font-condensed inline-flex items-center justify-center px-4 py-[10px] rounded bg-[#1F2933] text-white text-xs hover:brightness-110 whitespace-nowrap"
+              >
+                Choose from gallery
+              </button>
+            </div>
 
             {form.icon && (
-              <div className="shrink-0 flex items-center">
+              <div className="mt-2 flex items-center gap-3">
                 <img
                   src={form.icon}
                   alt="icon preview"
-                  className="w-8 h-8 object-contain border border-neutral-200 rounded"
+                  className="w-8 h-8 object-contain border border-neutral-200 rounded bg-white"
                 />
+                <code className="text-xs text-neutral-500 break-all">
+                  {form.icon}
+                </code>
               </div>
             )}
-          </div>
+          </label>
         </div>
+
+        {/* Gallery modal */}
+        {showIconGallery && (
+          <ImageGalleryModal
+            onSelect={(url) => {
+              setField("icon", url);
+              setShowIconGallery(false);
+            }}
+            onClose={() => setShowIconGallery(false)}
+          />
+        )}
 
         {/* Rich text editor */}
         <div className="mt-2">

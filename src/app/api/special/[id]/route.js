@@ -35,16 +35,13 @@ export async function PUT(req, { params }) {
     link,
     buttonColor,
     active,
-
-    // fallback polja
     title,
     button,
     rich,
     richHtml,
-
-    // nova multi-lang polja
     translations: rawTranslations,
     defaultLang,
+    category,
   } = body;
 
   const translations = rawTranslations || {};
@@ -74,6 +71,7 @@ export async function PUT(req, { params }) {
     buttonColor: buttonColor || "green",
 
     translations: Object.keys(translations).length ? translations : null,
+    category: category || "ALL",
   };
 
   const row = await prisma.specialPromotion.upsert({

@@ -1,5 +1,6 @@
 "use client";
-import React, { useEffect } from "react";
+
+import React from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
@@ -8,14 +9,17 @@ import Placeholder from "@tiptap/extension-placeholder";
 import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
 import dynamic from "next/dynamic";
-import {  Mark, mergeAttributes } from "@tiptap/core";
+import { Mark, mergeAttributes } from "@tiptap/core";
+
 import LinkControl from "./LinkControl";
+import ImageGalleryModal from "@/app/admin/components/ImageGalleryModal";
 
 const EmojiCorePicker = dynamic(() => import("./EmojiPicker"), { ssr: false });
 
 /* ---------- Emoji button ---------- */
 function EmojiButton({ editor }) {
   const [open, setOpen] = React.useState(false);
+
   return (
     <div className="relative">
       <button
@@ -23,8 +27,27 @@ function EmojiButton({ editor }) {
         onClick={() => setOpen((v) => !v)}
         className="h-8 w-8 flex items-center justify-center rounded-md border border-neutral-200 text-sm text-neutral-700 hover:bg-neutral-50"
       >
-        😊
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <g clipPath="url(#clip0_46_2139)">
+            <path
+              d="M7.99998 1.33325C11.682 1.33325 14.6666 4.31792 14.6666 7.99992C14.6666 11.6819 11.682 14.6666 7.99998 14.6666C4.31798 14.6666 1.33331 11.6819 1.33331 7.99992C1.33331 4.31792 4.31798 1.33325 7.99998 1.33325ZM7.99998 2.66659C6.58549 2.66659 5.22894 3.22849 4.22874 4.22868C3.22855 5.22888 2.66665 6.58543 2.66665 7.99992C2.66665 9.41441 3.22855 10.771 4.22874 11.7712C5.22894 12.7713 6.58549 13.3333 7.99998 13.3333C9.41447 13.3333 10.771 12.7713 11.7712 11.7712C12.7714 10.771 13.3333 9.41441 13.3333 7.99992C13.3333 6.58543 12.7714 5.22888 11.7712 4.22868C10.771 3.22849 9.41447 2.66659 7.99998 2.66659ZM9.86665 9.23792C9.92884 9.17517 10.0029 9.12542 10.0845 9.09154C10.1661 9.05766 10.2536 9.04034 10.342 9.04059C10.4303 9.04083 10.5177 9.05863 10.5991 9.09296C10.6805 9.12729 10.7543 9.17745 10.8162 9.24054C10.878 9.30363 10.9267 9.37838 10.9594 9.46045C10.9921 9.54252 11.0082 9.63028 11.0067 9.71861C11.0052 9.80695 10.9861 9.89411 10.9506 9.97502C10.9152 10.0559 10.8639 10.129 10.8 10.1899C10.0529 10.9238 9.0472 11.3344 7.99998 11.3333C6.95276 11.3344 5.94707 10.9238 5.19998 10.1899C5.07667 10.0655 5.00726 9.89759 5.00678 9.72242C5.0063 9.54726 5.07477 9.37895 5.1974 9.25387C5.32002 9.12879 5.48695 9.057 5.66208 9.05401C5.83722 9.05103 6.0065 9.11709 6.13331 9.23792C6.63119 9.72739 7.30179 10.0011 7.99998 9.99992C8.72665 9.99992 9.38465 9.70992 9.86665 9.23792ZM5.66665 5.33325C5.93186 5.33325 6.18622 5.43861 6.37375 5.62614C6.56129 5.81368 6.66665 6.06804 6.66665 6.33325C6.66665 6.59847 6.56129 6.85282 6.37375 7.04036C6.18622 7.22789 5.93186 7.33325 5.66665 7.33325C5.40143 7.33325 5.14708 7.22789 4.95954 7.04036C4.772 6.85282 4.66665 6.59847 4.66665 6.33325C4.66665 6.06804 4.772 5.81368 4.95954 5.62614C5.14708 5.43861 5.40143 5.33325 5.66665 5.33325ZM10.3333 5.33325C10.5985 5.33325 10.8529 5.43861 11.0404 5.62614C11.228 5.81368 11.3333 6.06804 11.3333 6.33325C11.3333 6.59847 11.228 6.85282 11.0404 7.04036C10.8529 7.22789 10.5985 7.33325 10.3333 7.33325C10.0681 7.33325 9.81374 7.22789 9.62621 7.04036C9.43867 6.85282 9.33331 6.59847 9.33331 6.33325C9.33331 6.06804 9.43867 5.81368 9.62621 5.62614C9.81374 5.43861 10.0681 5.33325 10.3333 5.33325Z"
+              fill="#667085"
+            />
+          </g>
+          <defs>
+            <clipPath id="clip0_46_2139">
+              <rect width="16" height="16" fill="white" />
+            </clipPath>
+          </defs>
+        </svg>
       </button>
+
       {open && (
         <div className="absolute right-0 mt-2 z-50">
           <EmojiCorePicker
@@ -51,7 +74,7 @@ const COLOR_PRESETS = {
   gold: "#FFD47F",
   pink: "#FF55A9",
   lilac: "#D4A9D4",
-  skyblue: "#82D4FF", 
+  skyblue: "#82D4FF",
   error: "#F44336",
   warning: "#FF9800",
 };
@@ -65,7 +88,7 @@ const COLORS = [
   "lilac",
   "skyblue",
   "error",
-  "warning"
+  "warning",
 ];
 
 const HEADING_LEVELS = [
@@ -75,7 +98,8 @@ const HEADING_LEVELS = [
   { label: "H3", value: 3 },
 ];
 
-/* ---------- Mark: fontSize ---------- */
+/* ---------- Marks ---------- */
+
 const FontSizeMark = Mark.create({
   name: "fontSize",
 
@@ -112,7 +136,6 @@ const FontSizeMark = Mark.create({
   },
 });
 
-/* ---------- Mark: fontColor (sa realnim bojama) ---------- */
 const FontColorMark = Mark.create({
   name: "fontColor",
 
@@ -155,16 +178,15 @@ const FontColorMark = Mark.create({
   },
 });
 
-/* ---------- Color picker button  ---------- */
-function ColorPicker({ editor, activeColor, setColor }) {
-  const [open, setOpen] = React.useState(false);
+/* ---------- Color picker ---------- */
 
+function ColorPicker({ activeColor, setColor }) {
+  const [open, setOpen] = React.useState(false);
   const currentColor =
-    COLOR_PRESETS[activeColor] || COLOR_PRESETS["black"] || "#111827";
+    COLOR_PRESETS[activeColor] || COLOR_PRESETS.black || "#111827";
 
   return (
-   <div className="relative">
-      {/* Trigger */}
+    <div className="relative">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
@@ -178,7 +200,6 @@ function ColorPicker({ editor, activeColor, setColor }) {
 
       {open && (
         <div className="absolute left-0 mt-2 z-50 bg-white border border-neutral-200 rounded-md shadow-md p-2">
-          {/* GRID samo za boje */}
           <div className="grid grid-cols-3 gap-2 w-[100px]">
             {COLORS.map((key) => (
               <button
@@ -194,7 +215,6 @@ function ColorPicker({ editor, activeColor, setColor }) {
             ))}
           </div>
 
-          {/* Reset ispod, van grida */}
           <button
             type="button"
             onClick={() => {
@@ -211,14 +231,15 @@ function ColorPicker({ editor, activeColor, setColor }) {
   );
 }
 
-
-/* ---------- Komponenta ---------- */
+/* ---------- Main component ---------- */
 
 export default function RichEditor({
   initialJSON = null,
   placeholder = "Upiši sadržaj…",
   onChange,
 }) {
+  const [showImageGallery, setShowImageGallery] = React.useState(false);
+
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
@@ -226,14 +247,14 @@ export default function RichEditor({
       FontColorMark,
       StarterKit.configure({}),
       Underline,
-       Link.configure({
-      openOnClick: false,         
-      autolink: true,
-      linkOnPaste: true,
-      HTMLAttributes: {
-        class: "text-green-500 underline cursor-pointer", 
-      },
-    }),
+      Link.configure({
+        openOnClick: false,
+        autolink: true,
+        linkOnPaste: true,
+        HTMLAttributes: {
+          class: "text-green-500 underline cursor-pointer",
+        },
+      }),
       Image.configure({ inline: false, allowBase64: false }),
       TextAlign.configure({ types: ["heading", "paragraph", "listItem"] }),
       Placeholder.configure({ placeholder }),
@@ -248,11 +269,6 @@ export default function RichEditor({
       },
     },
   });
-
-  useEffect(() => {
-    if (!editor) return;
-   
-  }, [editor]);
 
   if (!editor) return null;
 
@@ -273,35 +289,9 @@ export default function RichEditor({
 
   const activeSize = editor.getAttributes("fontSize")?.fs || "";
   const activeColor = editor.getAttributes("fontColor")?.colorKey || "";
-
   const currentHeading = editor.isActive("heading")
     ? editor.getAttributes("heading")?.level || 0
     : 0;
-
- function promptLink() {
-  const prev = editor.getAttributes("link").href || "";
-  const url = window.prompt("Unesi URL", prev);
-  if (url === null) return;
-  if (url === "") editor.chain().focus().unsetLink().run();
-  else editor.chain().focus().setLink({ href: url }).run();
-}
-
-  async function insertImage(file) {
-    if (!file) return;
-    const fd = new FormData();
-    fd.append("file", file);
-    const res = await fetch("/api/upload", {
-      method: "POST",
-      body: fd,
-      credentials: "include",
-    });
-    if (!res.ok) {
-      alert((await res.text().catch(() => null)) || "Upload error");
-      return;
-    }
-    const { url } = await res.json();
-    editor.chain().focus().setImage({ src: url }).run();
-  }
 
   return (
     <div className="rounded-lg border border-neutral-200 bg-white">
@@ -321,11 +311,7 @@ export default function RichEditor({
         </select>
 
         {/* Color picker */}
-        <ColorPicker
-          editor={editor}
-          activeColor={activeColor}
-          setColor={setColor}
-        />
+        <ColorPicker activeColor={activeColor} setColor={setColor} />
 
         {/* Bold / Italic / Underline */}
         <button
@@ -356,7 +342,7 @@ export default function RichEditor({
           <span className="underline">U</span>
         </button>
 
-        {/* Heading dropdown */}
+        {/* Heading */}
         <select
           className="h-8 px-2 rounded-md border border-neutral-200 text-[13px] text-neutral-700 bg-white"
           value={currentHeading}
@@ -520,14 +506,18 @@ export default function RichEditor({
           </svg>
         </button>
 
-      <LinkControl editor={editor} />
+        {/* Link controls */}
+        <LinkControl editor={editor} />
 
         {/* Emoji */}
         <EmojiButton editor={editor} />
 
-        {/* Image upload */}
-        <label className={`${btnBase} cursor-pointer`}>
-          {/* Ikonica za sliku po želji */}
+        {/* Image from gallery */}
+        <button
+          type="button"
+          onClick={() => setShowImageGallery(true)}
+          className={btnBase}
+        >
           <svg
             width="20"
             height="20"
@@ -543,19 +533,24 @@ export default function RichEditor({
               strokeLinejoin="round"
             />
           </svg>
-          <input
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={(e) => insertImage(e.target.files?.[0] || null)}
-          />
-        </label>
+        </button>
       </div>
 
       {/* Content */}
       <div className="px-3 py-2 list-inside">
         <EditorContent editor={editor} />
       </div>
+
+      {/* Gallery modal */}
+      {showImageGallery && (
+        <ImageGalleryModal
+          onSelect={(url) => {
+            editor.chain().focus().setImage({ src: url }).run();
+            setShowImageGallery(false);
+          }}
+          onClose={() => setShowImageGallery(false)}
+        />
+      )}
     </div>
   );
 }

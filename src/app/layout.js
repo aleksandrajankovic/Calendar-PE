@@ -59,7 +59,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
         
       <body
-        className={`${roboto.variable} ${robotoCondensed.variable}`}
+        className={`${roboto.variable} ${robotoCondensed.variable} min-h-screen`}
       >
         {children}
         <Toaster
