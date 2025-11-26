@@ -22,7 +22,6 @@ export default function CalendarDayCell({ cell, lang, adminPreview }) {
   const category = cell.category || "ALL";
   const categoryLabel = getCategoryLabel(category);
 
-
   const gradientClass = locked ? "bg-black" : getCategoryGradient(category);
 
   return (
@@ -60,7 +59,9 @@ export default function CalendarDayCell({ cell, lang, adminPreview }) {
           ${adminPreview && cell.isFutureForUx ? "opacity-90" : ""}
         `}
         aria-label={
-          cell.hasPromo ? `Day ${cell.day} – ${categoryLabel}` : `Day ${cell.day}`
+          cell.hasPromo
+            ? `Day ${cell.day} – ${categoryLabel}`
+            : `Day ${cell.day}`
         }
         title={
           !adminPreview && cell.isFutureForUx
