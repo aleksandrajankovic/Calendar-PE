@@ -158,7 +158,7 @@ export default function CalendarMobileStack({ adminPreview = false }) {
       }}
       onClick={() => !isGhost && setActiveIndex(index)}
     >
-      {/* TODAY highlight (samo ako nije ghost) */}
+      {/* TODAY highlight (ako nije ghost) */}
       {isToday && !isGhost && (
         <span
           className="
