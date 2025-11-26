@@ -1,9 +1,19 @@
+// src/lib/db.js
 import { PrismaClient } from "@prisma/client";
 
+const globalForPrisma = globalThis;
+
 let prisma;
-if (!global._prisma) {
-  global._prisma = new PrismaClient();
+
+if (!globalForPrisma._prisma) {
+  try {
+    globalForPrisma._prisma = new PrismaClient();
+  } catch (e) {
+    console.error("PRISMA INIT ERROR >>>", e);
+    throw e;
+  }
 }
-prisma = global._prisma;
+
+prisma = globalForPrisma._prisma;
 
 export default prisma;
