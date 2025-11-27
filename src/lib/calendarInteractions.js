@@ -42,11 +42,9 @@ function renderModalHTML(entry, lang = "pt") {
   // --- kategorija (žuti label) ---
   let categoryLabel;
   if (type === "special") {
-    categoryLabel =
-      lang === "pt" ? "Promoção especial" : "Special promotion";
+    categoryLabel = lang === "pt" ? "Promoção especial" : "Special promotion";
   } else {
-    categoryLabel =
-      lang === "pt" ? "Promoção semanal" : "Weekly promotion";
+    categoryLabel = lang === "pt" ? "Promoção semanal" : "Weekly promotion";
   }
 
   // --- button ---
@@ -56,8 +54,7 @@ function renderModalHTML(entry, lang = "pt") {
   const isYellow = buttonColor === "yellow";
 
   const defaultButtonLabel =
-    button ||
-    (lang === "pt" ? "Registrar-se" : "Register");
+    button || (lang === "pt" ? "Registrar-se" : "Register");
 
   // --- HTML struktura: slika → title → žuti label → opis → dugme ---
   return `
@@ -142,14 +139,45 @@ export function initCalendarInteractions(rootSelector = "#calendar-root") {
   const modal = root.querySelector("#promo-modal");
   const content = root.querySelector("#promo-content");
   const closeBtn = root.querySelector("#promo-close");
+  const dialog = modal ? modal.querySelector("#promo-dialog") : null;
 
   if (!modal || !content) return;
 
   let isOpen = false;
   let previousUrl = null;
 
+  function animateOpen() {
+    if (!dialog) return;
+
+    // reset na zatvoreno stanje
+    dialog.classList.remove("opacity-100", "translate-y-0", "scale-100");
+    dialog.classList.add("opacity-0", "translate-y-4", "scale-95");
+
+    // sledeći frame → otvoreno stanje
+    requestAnimationFrame(() => {
+      dialog.classList.remove("opacity-0", "translate-y-4", "scale-95");
+      dialog.classList.add("opacity-100", "translate-y-0", "scale-100");
+    });
+  }
+
+  function animateClose(cb) {
+    if (!dialog) {
+      cb?.();
+      return;
+    }
+
+    dialog.classList.remove("opacity-100", "translate-y-0", "scale-100");
+    dialog.classList.add("opacity-0", "translate-y-4", "scale-95");
+
+    // duration mora da se poklopi sa Tailwind `duration-200`
+    setTimeout(() => {
+      cb?.();
+    }, 200);
+  }
+
   function openModal(entry) {
     content.innerHTML = renderModalHTML(entry, lang);
+
     modal.classList.remove("hidden");
     document.body.style.overflow = "hidden";
     isOpen = true;
@@ -159,16 +187,21 @@ export function initCalendarInteractions(rootSelector = "#calendar-root") {
     if (entry && entry.shareUrl) {
       history.pushState({ promo: true }, "", entry.shareUrl);
     }
+
+    animateOpen();
   }
 
   function closeModal({ fromPopstate = false } = {}) {
-    modal.classList.add("hidden");
-    document.body.style.overflow = "";
     isOpen = false;
+    document.body.style.overflow = "";
 
-    if (!fromPopstate && previousUrl) {
-      history.replaceState(null, "", previousUrl);
-    }
+    animateClose(() => {
+      modal.classList.add("hidden");
+
+      if (!fromPopstate && previousUrl) {
+        history.replaceState(null, "", previousUrl);
+      }
+    });
   }
 
   // Klik na dan - otvori modal

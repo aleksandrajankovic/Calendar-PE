@@ -82,40 +82,57 @@ export default function CalendarGrid({
         <CalendarMobileStack adminPreview={adminPreview} />
       </div>
       {/* MODAL*/}
+    
       <div
         id="promo-modal"
         className="
-          hidden
-          fixed inset-0 z-50
-          bg-black/70
-          flex items-center justify-center
-          px-4
-        "
+    fixed inset-0 z-40
+    hidden
+    bg-black/70
+    flex items-center justify-center
+    px-4
+  "
       >
+        {/* sam modal / dialog */}
         <div
+          id="promo-dialog"
           className="
-            relative
-            w-full max-w-[540px]
-            bg-[#11131B]
-            rounded-3xl
-            p-6 md:p-8
-            text-white
-          "
+      relative
+      w-full max-w-[480px]
+      max-h-[80vh]       
+      bg-[#05070D]
+      rounded-2xl
+      shadow-xl
+      transform-gpu transition-all duration-200 ease-out
+      flex flex-col
+      p-4 sm:p-6
+    "
         >
+          {/* X dugme fiksirano u gornjem desnom uglu modala */}
           <button
             id="promo-close"
-            type="button"
-            aria-label={lang === "pt" ? "Fechar" : "Close"}
             className="
-              absolute right-4 top-4
-              text-white/70 hover:text-white
-              text-xl
-            "
+        absolute right-3 top-3
+        h-8 w-8
+        flex items-center justify-center
+        rounded-full
+        text-white/70 hover:text-white
+        bg-white/5 hover:bg-white/10
+      "
+            aria-label="Close"
           >
-            ×
+            ✕
           </button>
 
-          <div id="promo-content" className="mt-4 text-sm text-white/90" />
+          {/* sadržaj koji renderuje renderModalHTML → skroluje se unutar modala */}
+          <div
+            id="promo-content"
+            className="
+        mt-6              
+        overflow-y-auto
+        pr-2            
+      "
+          ></div>
         </div>
       </div>
 
