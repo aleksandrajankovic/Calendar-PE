@@ -184,19 +184,23 @@ export default async function Home({ searchParams }) {
       {/* MAIN CONTENT */}
       <main
         className="
-    w-full
+      w-full
     bg-no-repeat bg-cover bg-center
     calendar-bg
+    min-h-[100dvh]          /* uvek bar visina ekrana */
+    overflow-hidden         /* nema skrola na mobile */
+    md:overflow-auto        /* na desku normalan scroll ako zatreba */
   "
         style={{ backgroundImage: `url("${bgImageUrl}")` }}
       >
         <div
           className="
-      mx-auto
-      w-full
-      max-w-6xl
-      px-4 sm:px-6 md:px-10 lg:px-16
-      pt-6 pb-10
+     mx-auto
+    w-full
+    max-w-6xl
+    px-4 sm:px-6 md:px-10 lg:px-16
+    pt-4 pb-4            /* manje vertikalno za mobile */
+    md:pt-6 md:pb-10
     "
         >
           <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white text-center">

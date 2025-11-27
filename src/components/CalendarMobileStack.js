@@ -91,15 +91,10 @@ export default function CalendarMobileStack({ adminPreview = false }) {
     <div className="w-full flex flex-col items-center">
       {/* stack kartica */}
       <div
-        className="
-           relative
-    w-full
-    max-w-[380px]
-    overflow-hidden
-  "
-        style={{ height: STACK_HEIGHT }}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
+        className="relative w-full max-w-[380px] overflow-hidden touch-none"
+       style={{ height: STACK_HEIGHT }}
+  onTouchStart={handleTouchStart}
+  onTouchEnd={handleTouchEnd}
       >
       {days.map((day, index) => {
   const offset = index - activeIndex;
@@ -130,13 +125,7 @@ export default function CalendarMobileStack({ adminPreview = false }) {
       data-day-button
       data-day={day.day}
       disabled={locked || isGhost}  
-      className={`
-        absolute top-0 left-1/2
-        w-[92%]
-        h-[140px]
-        rounded-[18px]
-        overflow-hidden
-        border 
+      className={`absolute top-0 left-1/2 w-[92%] h-[140px] rounded-[18px] overflow-hidden border 
         ${
           isGhost
             ? "bg-[#000000D9] border border-white/20 shadow-[0_2px_6px_rgba(0,0,0,0.4)]"
@@ -174,14 +163,7 @@ export default function CalendarMobileStack({ adminPreview = false }) {
 
       {/* broj dana */}
       <span
-        className="
-          absolute left-4 top-3
-          z-10
-          text-[64px] leading-[65px]
-          font-bold
-          bg-gradient-to-b from-white to-white/80
-          bg-clip-text text-transparent
-        "
+        className="absolute left-4 top-3 z-10 text-[64px] leading-[65px] font-bold bg-gradient-to-b from-white to-white/80 bg-clip-text text-transparent"
       >
         {day.day.toString().padStart(2, "0")}
       </span>
@@ -192,10 +174,7 @@ export default function CalendarMobileStack({ adminPreview = false }) {
           <img
             src={day.icon}
             alt="promo icon"
-            className="
-              absolute right-0 inset-y-0
-              h-full w-[50%]
-              object-cover object-top
+            className="absolute right-0 inset-y-0 h-full w-[50%] object-cover object-top
             "
             loading="lazy"
           />

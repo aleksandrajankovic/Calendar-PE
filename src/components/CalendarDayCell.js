@@ -29,14 +29,7 @@ export default function CalendarDayCell({ cell, lang, adminPreview }) {
       {/* overlay za today – ide na spoljašnji wrapper */}
       {cell.isToday && (
         <span
-          className="
-            pointer-events-none
-            absolute -inset-px
-            z-20
-            rounded-[12px]
-            ring-1 ring-[#FACC01]
-            shadow-[0_0_15px_rgba(250,204,1,0.9)]
-          "
+          className="pointer-events-none absolute -inset-px z-20 rounded-[12px] ring-1 ring-[#FACC01] shadow-[0_0_15px_rgba(250,204,1,0.9)]"
         />
       )}
 
@@ -44,11 +37,7 @@ export default function CalendarDayCell({ cell, lang, adminPreview }) {
         data-day-button
         data-day={cell.day}
         disabled={locked}
-        className={`
-          relative w-full h-full
-          rounded-[12px]
-          overflow-hidden
-          border 
+        className={`relative w-full h-full rounded-[12px] overflow-hidden border 
           ${gradientClass}
           transition
           ${
