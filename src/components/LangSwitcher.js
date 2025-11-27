@@ -5,7 +5,7 @@ import { useState, useRef, useEffect } from "react";
 
 const LANG_META = {
   pt: {
-    flag: "/img/ca.svg",        // promeni putanju/naziv ako je drugačije
+    flag: "/img/ca.svg",      
     alt: "Português (Brasil)",
     label: "PT",
   },
@@ -36,7 +36,7 @@ export default function LangSwitcher({ year, month, lang, allowedLangs }) {
   }, []);
 
   return (
-    <div ref={wrapperRef} className="hidden md:block relative z-30">
+    <div ref={wrapperRef} className="block relative z-30">
       {/* GORNJE DUGME – aktivna zastavica */}
       <button
         type="button"

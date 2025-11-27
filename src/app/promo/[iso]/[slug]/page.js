@@ -3,12 +3,12 @@ export const runtime = "nodejs";
 
 import prisma from "@/lib/db";
 import { headers } from "next/headers";
-import { notFound, permanentRedirect } from "next/navigation";
+import { notFound, permanentRedirect, redirect } from "next/navigation";
 import { slugify } from "@/lib/slug";
 
 // ---------- helpers ----------
 async function absoluteUrl(path) {
-  const h = await headers();      
+  const h = await headers();
 
   const proto = h.get("x-forwarded-proto") ?? "http";
   const host = h.get("host") ?? "localhost:3000";
@@ -92,9 +92,16 @@ export async function generateMetadata({ params }) {
   };
 }
 
-
 // ---------- PAGE (SSR) ----------
 export default async function PromoDetailPage({ params }) {
+  // 🔴 PRIVREMENO ISKLJUČENO:
+  // svaki pristup /promo/[iso]/[slug] šaljemo nazad na kalendar
+  redirect("/");
+
+  // Ako kasnije hoćeš da vratiš single page, samo obriši `redirect("/")`
+  // i odkomentariši kod ispod:
+
+  /*
   const p = await params; // Next 16
   const parsed = parseISO(p.iso);
   if (!parsed) notFound();
@@ -122,7 +129,7 @@ export default async function PromoDetailPage({ params }) {
 
       {promo.richHtml ? (
         <article
-          className="prose prose-invert max-w-none  prose prose-invert max-w-none [&_ul]:list-inside [&_ul]:pl-0 [&_ul_li_p]:m-0 [&_ul_li_p]:inline"
+          className="prose prose-invert max-w-none [&_ul]:list-inside [&_ul]:pl-0 [&_ul_li_p]:m-0 [&_ul_li_p]:inline"
           dangerouslySetInnerHTML={{ __html: promo.richHtml }}
         />
       ) : (
@@ -159,4 +166,5 @@ export default async function PromoDetailPage({ params }) {
       </div>
     </main>
   );
+  */
 }

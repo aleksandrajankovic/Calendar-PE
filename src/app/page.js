@@ -4,6 +4,7 @@ import CalendarEnhancer from "@/components/CalendarEnhancer";
 import prisma from "@/lib/db";
 import { cookies } from "next/headers";
 import LangSwitcher from "@/components/LangSwitcher";
+import SnowOverlay from "@/components/SnowOverlay";
 
 // -------------------------
 // HELPERS
@@ -193,6 +194,7 @@ export default async function Home({ searchParams }) {
   "
         style={{ backgroundImage: `url("${bgImageUrl}")` }}
       >
+        <SnowOverlay />
         <div
           className="
      mx-auto

@@ -68,7 +68,7 @@ function renderModalHTML(entry, lang = "pt") {
           : ""
       }
 
-      <h2 class="font-bold text-[24px] md:text-[28px] leading-tight mb-2 text-center">
+      <h2 class="font-bold text-[24px] md:text-[28px] leading-tight mb-2 text-center text-white">
         ${title}
       </h2>
 
