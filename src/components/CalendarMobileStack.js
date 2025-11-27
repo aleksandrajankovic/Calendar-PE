@@ -146,7 +146,7 @@ export default function CalendarMobileStack({ adminPreview = false }) {
                 ${
                   isTodayActive
                     ? "border-2 border-[#FACC01] shadow-[0_0_20px_rgba(250,204,1,0.9)]"
-                    : "border border-transparent"
+                    : "border"
                 }
                 ${
                   isGhost

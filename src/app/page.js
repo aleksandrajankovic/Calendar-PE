@@ -187,9 +187,9 @@ export default async function Home({ searchParams }) {
       w-full
     bg-no-repeat bg-cover bg-center
     calendar-bg
-    min-h-[100dvh]          /* uvek bar visina ekrana */
-    overflow-hidden         /* nema skrola na mobile */
-    md:overflow-auto        /* na desku normalan scroll ako zatreba */
+    min-h-[100dvh]        
+    overflow-hidden         
+    md:overflow-auto       
   "
         style={{ backgroundImage: `url("${bgImageUrl}")` }}
       >
@@ -199,7 +199,7 @@ export default async function Home({ searchParams }) {
     w-full
     max-w-6xl
     px-4 sm:px-6 md:px-10 lg:px-16
-    pt-4 pb-4            /* manje vertikalno za mobile */
+    pt-4 pb-4        
     md:pt-6 md:pb-10
     "
         >
@@ -222,7 +222,7 @@ export default async function Home({ searchParams }) {
               Admin preview
             </div>
           )}
-       {/* MOBILE PAGINATION – IZNAD kalendara */}
+          {/* MOBILE PAGINATION – IZNAD kalendara */}
           <div className="mt-6 flex items-center justify-center md:hidden">
             <div className="inline-flex items-center gap-4 rounded-full bg-black/40 px-4 py-2 text-white text-sm">
               <a
