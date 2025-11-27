@@ -207,7 +207,7 @@ export default async function Home({ searchParams }) {
             {lang === "pt" ? "Calendário de Promoções" : "Promotion Calendar"}
           </h1>
 
-          <h3
+          {/* <h3
             className="mt-5 font-roboto font-normal text-[24px] leading-[100%] tracking-[1%]
          bg-[linear-gradient(180deg,rgba(255,255,255,0.7)_0%,rgba(193,193,193,0.7)_100%)]
          bg-clip-text text-transparent text-center"
@@ -215,7 +215,7 @@ export default async function Home({ searchParams }) {
             {lang === "pt"
               ? "Todo dia algo diferente, só na Meridianbet."
               : "Everyday something else, only in Merdianbet."}
-          </h3>
+          </h3> */}
 
           {isAdmin && (
             <div className="mt-2 inline-block rounded bg-amber-500/20 text-amber-200 px-3 py-1 text-sm">
