@@ -48,7 +48,7 @@ export default function CalendarDayCell({ cell, lang, adminPreview }) {
           relative w-full h-full
           rounded-[12px]
           overflow-hidden
-          border border-transparent
+          border 
           ${gradientClass}
           transition
           ${

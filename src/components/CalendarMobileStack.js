@@ -136,7 +136,7 @@ export default function CalendarMobileStack({ adminPreview = false }) {
         h-[140px]
         rounded-[18px]
         overflow-hidden
-        border border-transparent
+        border 
         ${
           isGhost
             ? "bg-[#000000D9] border border-white/20 shadow-[0_2px_6px_rgba(0,0,0,0.4)]"
@@ -162,12 +162,12 @@ export default function CalendarMobileStack({ adminPreview = false }) {
       {isToday && !isGhost && (
         <span
           className="
-            pointer-events-none
+                 pointer-events-none
             absolute -inset-px
             z-20
-            rounded-[18px]
-            ring-2 ring-[#FACC01]
-            shadow-[0_0_18px_rgba(250,204,1,0.9)]
+            rounded-[12px]
+            ring-1 ring-[#FACC01]
+            shadow-[0_0_15px_rgba(250,204,1,0.9)]
           "
         />
       )}
