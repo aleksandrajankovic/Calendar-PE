@@ -2,7 +2,7 @@
 export const runtime = "nodejs";
 
 import bcrypt from "bcryptjs";
-import prisma from "@/lib/db"; // ili odakle već importaš Prisma klijenta
+import prisma from "@/lib/db";
 
 const maxAge = 60 * 60 * 24 * 7; // 7 dana
 

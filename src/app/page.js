@@ -80,7 +80,7 @@ function normalizeSpecials(rows = [], lang) {
 }
 
 function getMonthLabel(year, month, lang) {
-  const locale = lang === "pt" ? "pt-BR" : "en-US";
+  const locale = lang === "es" ? "es-PE" : "en-US";
   const raw = new Date(year, month, 1).toLocaleString(locale, {
     month: "long",
   });
@@ -103,8 +103,8 @@ export default async function Home({ searchParams }) {
   const mRaw = getParam(sp, "m");
   const langRaw = getParam(sp, "lang");
 
-  const ALLOWED_LANGS = ["pt", "en"];
-  const lang = ALLOWED_LANGS.includes(langRaw) ? langRaw : "pt";
+  const ALLOWED_LANGS = ["es", "en"];
+  const lang = ALLOWED_LANGS.includes(langRaw) ? langRaw : "es";
 
   const reqYear = Number.parseInt(yRaw ?? "", 10);
   const reqMonth = Number.parseInt(mRaw ?? "", 10);
@@ -190,7 +190,8 @@ export default async function Home({ searchParams }) {
     calendar-bg
     min-h-[100dvh]        
     overflow-hidden         
-    md:overflow-auto       
+    md:overflow-auto   
+    flex justify-center    
   "
         style={{ backgroundImage: `url("${bgImageUrl}")` }}
       >
@@ -206,18 +207,10 @@ export default async function Home({ searchParams }) {
     "
         >
           <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white text-center">
-            {lang === "pt" ? "Calendário de Promoções" : "Promotion Calendar"}
+            {lang === "es" ? "Calendario Promocional" : "Promotion Calendar"}
           </h1>
 
-          {/* <h3
-            className="mt-5 font-roboto font-normal text-[24px] leading-[100%] tracking-[1%]
-         bg-[linear-gradient(180deg,rgba(255,255,255,0.7)_0%,rgba(193,193,193,0.7)_100%)]
-         bg-clip-text text-transparent text-center"
-          >
-            {lang === "pt"
-              ? "Todo dia algo diferente, só na Meridianbet."
-              : "Everyday something else, only in Merdianbet."}
-          </h3> */}
+     
 
           {isAdmin && (
             <div className="mt-2 inline-block rounded bg-amber-500/20 text-amber-200 px-3 py-1 text-sm">

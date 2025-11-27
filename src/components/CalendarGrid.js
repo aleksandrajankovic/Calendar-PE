@@ -78,7 +78,7 @@ export default function CalendarGrid({
         </div>
       </div>
       {/* MOBILE STACK (<= 768) */}
-      <div className="md:hidden flex justify-center min-h-[calc(100vh-200px)] items-start">
+      <div className="md:hidden flex justify-center min-h-[calc(100vh-200px)]">
         <CalendarMobileStack adminPreview={adminPreview} />
       </div>
       {/* MODAL*/}

@@ -4,10 +4,10 @@
 import { useState, useRef, useEffect } from "react";
 
 const LANG_META = {
-  pt: {
+  es: {
     flag: "/img/ca.svg",      
-    alt: "Português (Brasil)",
-    label: "PT",
+    alt: "Spanish (Peru)",
+    label: "ES",
   },
   en: {
     flag: "/img/en.svg",

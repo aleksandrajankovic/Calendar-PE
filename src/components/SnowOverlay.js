@@ -3,22 +3,22 @@
 
 import { useMemo } from "react";
 
-const FLAKE_COUNT = 45; // broj pahulja (možeš da menjaš)
+const FLAKE_COUNT = 45; 
 
 export default function SnowOverlay() {
   const flakes = useMemo(
     () =>
       Array.from({ length: FLAKE_COUNT }, (_, i) => {
         // nasumični parametri za svaku pahulju
-        const size = 6 + Math.random() * 18; // 6–24px → male + krupne
+        const size = 6 + Math.random() * 18; 
         return {
           id: i,
-          left: Math.random() * 100, // % širine ekrana
-          delay: Math.random() * 10, // kašnjenje animacije
-          duration: 12 + Math.random() * 12, // 12–24s
+          left: Math.random() * 100, 
+          delay: Math.random() * 10,
+          duration: 12 + Math.random() * 12,
           size,
-          opacity: 0.35 + Math.random() * 0.5, // 0.35–0.85
-          drift: -20 + Math.random() * 40, // -20 do +20px levo/desno
+          opacity: 0.35 + Math.random() * 0.5, 
+          drift: -20 + Math.random() * 40, 
         };
       }),
     []
@@ -29,7 +29,7 @@ export default function SnowOverlay() {
       className="
         pointer-events-none
         fixed inset-0
-        z-20             /* ispod modala (z-40), iznad pozadine */
+        z-20            
         overflow-hidden
       "
     >
