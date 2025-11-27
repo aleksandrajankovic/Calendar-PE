@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { getCategoryGradient } from "@/lib/promoCategoryStyles";
+import { rowdies } from "@/app/fonts";
 
 export default function CalendarMobileStack({ adminPreview = false }) {
   const [days, setDays] = useState([]);
@@ -10,7 +11,6 @@ export default function CalendarMobileStack({ adminPreview = false }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [touchStartY, setTouchStartY] = useState(null);
 
-  // čitamo payload iz #calendar-data
   useEffect(() => {
     const dataEl = document.getElementById("calendar-data");
     if (!dataEl) return;
@@ -19,29 +19,59 @@ export default function CalendarMobileStack({ adminPreview = false }) {
       const payload = JSON.parse(dataEl.textContent || "{}");
       const allDays = Array.isArray(payload.days) ? payload.days : [];
 
-      const now = new Date();
-
-      // uzmi samo "prave" dane (bez prev/next)
-      const onlyDays = allDays.filter((d) => d && typeof d.day === "number");
-
-      setDays(onlyDays);
-
       if (payload.lang) setLang(payload.lang);
 
-      // today → prvi sa promo → prvi dan
-      let todayIndex = onlyDays.findIndex((d) => d.isToday);
+      const year = payload.year;
+      const month = payload.month;
+
+      // 1) dani tekućeg meseca (isti kao za desktop)
+      const currentDays = allDays.filter((d) => d && typeof d.day === "number");
+
+      // 2) UVEK poslednja 4 dana PRETHODNOG meseca kao ghost kartice
+      let ghostDays = [];
+      if (typeof year === "number" && typeof month === "number") {
+        // date( year, month, 0 ) = poslednji dan prethodnog meseca
+        const prevLastDate = new Date(year, month, 0);
+        const prevMonthDays = prevLastDate.getDate(); // npr. 30 ili 31
+        const prevMonthIndex = prevLastDate.getMonth(); // 0–11
+        const prevYear = prevLastDate.getFullYear();
+
+        const GHOST_COUNT = 4;
+        const start = Math.max(1, prevMonthDays - GHOST_COUNT + 1);
+
+        for (let dayNum = start; dayNum <= prevMonthDays; dayNum++) {
+          ghostDays.push({
+            day: dayNum,
+            year: prevYear,
+            month: prevMonthIndex,
+            hasPromo: false,
+            isFutureForUx: false,
+            isLocked: true,
+            category: "ALL",
+            icon: null,
+            isGhost: true,
+            isToday: false,
+          });
+        }
+      }
+
+      // 3) ghost iz preth. meseca + ceo tekući mesec
+      const combinedDays = [...ghostDays, ...currentDays];
+
+      // 4) today → prvi sa promo → prvi dan
+      let todayIndex = combinedDays.findIndex((d) => d.isToday);
       if (todayIndex === -1) {
-        todayIndex = onlyDays.findIndex((d) => d.hasPromo);
+        todayIndex = combinedDays.findIndex((d) => d.hasPromo);
       }
       if (todayIndex === -1) todayIndex = 0;
 
+      setDays(combinedDays);
       setActiveIndex(todayIndex >= 0 ? todayIndex : 0);
     } catch {
       // ignore
     }
   }, []);
 
-  // navigacija gore/dole
   const goPrev = () => {
     setActiveIndex((idx) => (idx > 0 ? idx - 1 : idx));
   };
@@ -50,7 +80,6 @@ export default function CalendarMobileStack({ adminPreview = false }) {
     setActiveIndex((idx) => (idx < days.length - 1 ? idx + 1 : idx));
   };
 
-  // swipe gest
   const handleTouchStart = (e) => {
     setTouchStartY(e.touches[0].clientY);
   };
@@ -59,11 +88,8 @@ export default function CalendarMobileStack({ adminPreview = false }) {
     if (touchStartY == null) return;
     const delta = e.changedTouches[0].clientY - touchStartY;
 
-    if (delta > 40) {
-      goPrev(); // swipe down
-    } else if (delta < -40) {
-      goNext(); // swipe up
-    }
+    if (delta > 40) goPrev();
+    else if (delta < -40) goNext();
 
     setTouchStartY(null);
   };
@@ -78,7 +104,6 @@ export default function CalendarMobileStack({ adminPreview = false }) {
 
   return (
     <div className="w-full flex flex-col items-center">
-      {/* stack kartica */}
       <div
         className="relative w-full max-w-[380px] overflow-hidden touch-none"
         style={{ height: STACK_HEIGHT }}
@@ -91,15 +116,13 @@ export default function CalendarMobileStack({ adminPreview = false }) {
 
           const locked = day.isLocked && !adminPreview;
           const category = day.category || "ALL";
-
-          // ghost dan = nema promo i nije future
-          const isGhost = !day.hasPromo && !day.isFutureForUx;
-
+          const isGhost = Boolean(day.isGhost);
           const gradientClass = locked
             ? "bg-black"
             : getCategoryGradient(category);
-          const isToday = day.isToday;
-          const isTodayActive = isToday && !isGhost;
+
+          const isTodayActive = day.isToday && !isGhost;
+
           const translateY = ACTIVE_Y + offset * CARD_GAP;
           const scale =
             offset === 0
@@ -110,58 +133,59 @@ export default function CalendarMobileStack({ adminPreview = false }) {
 
           return (
             <button
-              key={day.day}
+              key={`mobile-${index}-${day.day}`}
               data-day-button
               data-day={day.day}
               disabled={locked || isGhost}
               onClick={() => !isGhost && setActiveIndex(index)}
               className={`
-    absolute top-0 left-1/2
-    w-[92%]
-    h-[140px]
-    rounded-[18px]
-    overflow-hidden
-
-    ${
-      isTodayActive
-        ? "border-2 border-[#FACC01] shadow-[0_0_20px_rgba(250,204,1,0.9)]"
-        : "border border-transparent"
-    }
-
-    ${
-      isGhost
-        ? "bg-[#000000D9] border-white/20 shadow-[0_2px_6px_rgba(0,0,0,0.4)]"
-        : gradientClass
-    }
-
-    shadow-[0_18px_40px_rgba(0,0,0,0.7)]
-    transition
-    duration-300
-    ${
-      locked || isGhost
-        ? "cursor-default"
-        : "cursor-pointer active:scale-[0.98]"
-    }
-  `}
+                absolute top-0 left-1/2
+                w-[92%] h-[140px]
+                rounded-[18px]
+                overflow-hidden
+                ${
+                  isTodayActive
+                    ? "border-2 border-[#FACC01] shadow-[0_0_20px_rgba(250,204,1,0.9)]"
+                    : "border border-transparent"
+                }
+                ${
+                  isGhost
+                    ? "bg-[#000000D9] border-white/20 shadow-[0_2px_6px_rgba(0,0,0,0.4)]"
+                    : gradientClass
+                }
+                shadow-[0_18px_40px_rgba(0,0,0,0.7)]
+                transition duration-300
+                ${
+                  locked || isGhost
+                    ? "cursor-default"
+                    : "cursor-pointer active:scale-[0.98]"
+                }
+              `}
               style={{
                 transform: `translate(-50%, ${translateY}px) scale(${scale})`,
                 zIndex,
                 opacity,
               }}
             >
-              {/* broj dana */}
-              <span className="absolute left-4 top-3 z-10 text-[64px] leading-[65px] font-bold bg-gradient-to-b from-white to-white/80 bg-clip-text text-transparent">
+              <span
+                className={`
+                  ${rowdies.className}
+                  absolute left-4 top-3
+                  z-10 text-[64px] leading-[65px]
+                  font-bold
+                  bg-gradient-to-b from-white to-white/80
+                  bg-clip-text text-transparent
+                `}
+              >
                 {day.day.toString().padStart(2, "0")}
               </span>
 
-              {/* slika / lock – samo ako NIJE ghost */}
               {!isGhost &&
                 (!locked && day.hasPromo && day.icon ? (
                   <img
                     src={day.icon}
                     alt="promo icon"
-                    className="absolute right-0 inset-y-0 h-full w-[50%] object-cover object-center
-            "
+                    className="absolute right-0 inset-y-0 h-full w-[50%] object-cover object-center"
                     loading="lazy"
                   />
                 ) : (
@@ -173,7 +197,6 @@ export default function CalendarMobileStack({ adminPreview = false }) {
                   />
                 ))}
 
-              {/* overlay samo ako nije ghost */}
               {!isGhost && (
                 <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/10 to-black/0" />
               )}
