@@ -28,9 +28,7 @@ export default function CalendarDayCell({ cell, lang, adminPreview }) {
     <div className="relative h-full w-full rounded-[12px]">
       {/* overlay za today – ide na spoljašnji wrapper */}
       {cell.isToday && (
-        <span
-          className="pointer-events-none absolute -inset-px z-20 rounded-[12px] ring-1 ring-[#FACC01] shadow-[0_0_15px_rgba(250,204,1,0.9)]"
-        />
+        <span className="pointer-events-none absolute -inset-px z-20 rounded-[12px] ring-1 ring-[#FACC01] shadow-[0_0_15px_rgba(250,204,1,0.9)]" />
       )}
 
       <button
@@ -81,12 +79,16 @@ export default function CalendarDayCell({ cell, lang, adminPreview }) {
             loading="lazy"
           />
         ) : (
-          <img
-            src="./img/lock.png"
-            alt="default promo icon"
-            className="absolute inset-0 w-full h-full object-cover"
-            loading="lazy"
-          />
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="flex items-center justify-center w-9 h-9 rounded-full bg-black/35">
+              <img
+                src="./img/lock.png"
+                alt="default promo icon"
+                className="w-5 h-5 object-contain"
+                loading="lazy"
+              />
+            </div>
+          </div>
         )}
       </button>
     </div>
