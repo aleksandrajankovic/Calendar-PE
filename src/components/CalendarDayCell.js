@@ -86,7 +86,9 @@ export default function CalendarDayCell({ cell, lang, adminPreview }) {
           <img
             src={cell.icon}
             alt="promo icon"
-            className="absolute right-0 inset-y-0 h-full w-auto object-contain"
+            className=" absolute right-0 inset-y-0
+              h-full w-[90%]
+              object-contain object-right"
             loading="lazy"
           />
         ) : (
