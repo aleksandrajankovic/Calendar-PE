@@ -206,7 +206,7 @@ export default async function Home({ searchParams }) {
             mx-auto md:mx-0 md:mr-auto   /* mobilno centrira, na desktopu levo */
           "
         >
-          <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white text-center">
+          <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white md:text-left text-center">
             {lang === "es" ? "Calendario Promocional" : "Promotion Calendar"}
           </h1>
 

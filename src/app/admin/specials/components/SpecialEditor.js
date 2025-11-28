@@ -6,7 +6,7 @@ import ImageGalleryModal from "../../components/ImageGalleryModal";
 
 // jezici za tabove
 const LANGS = [
-  { code: "pt", label: "Portuguese" },
+  { code: "es", label: "Spanish" },
   { code: "en", label: "English" },
 ];
 
