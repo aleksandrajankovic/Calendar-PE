@@ -172,7 +172,6 @@ export default async function Home({ searchParams }) {
 
         {/* desna strana: desktop flag dropdown + mobile text switcher */}
         <div className="flex items-center gap-2">
-          {/* desktop: flag dropdown */}
           <LangSwitcher
             year={year}
             month={month}
@@ -185,38 +184,38 @@ export default async function Home({ searchParams }) {
       {/* MAIN CONTENT */}
       <main
         className="
-      w-full
-    bg-no-repeat bg-cover bg-center
-    calendar-bg
-    min-h-[100dvh]        
-    overflow-hidden         
-    md:overflow-auto   
-    flex justify-center    
-  "
+          w-full
+          bg-no-repeat bg-cover bg-center
+          calendar-bg
+          min-h-[100dvh]        
+          overflow-hidden         
+          md:overflow-auto   
+          flex
+          justify-center md:justify-start   /* centar na mobilu, levo na desktopu */
+        "
         style={{ backgroundImage: `url("${bgImageUrl}")` }}
       >
         <SnowOverlay />
         <div
           className="
-     mx-auto
-    w-full
-    max-w-6xl
-    px-4 sm:px-6 md:px-10 lg:px-16
-    pt-4 pb-4        
-    md:pt-6 md:pb-10
-    "
+            w-full
+            max-w-6xl
+            px-4 sm:px-6 md:px-10 lg:px-16
+            pt-4 pb-4        
+            md:pt-6 md:pb-10
+            mx-auto md:mx-0 md:mr-auto   /* mobilno centrira, na desktopu levo */
+          "
         >
           <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white text-center">
             {lang === "es" ? "Calendario Promocional" : "Promotion Calendar"}
           </h1>
-
-     
 
           {isAdmin && (
             <div className="mt-2 inline-block rounded bg-amber-500/20 text-amber-200 px-3 py-1 text-sm">
               Admin preview
             </div>
           )}
+
           {/* MOBILE PAGINATION – IZNAD kalendara */}
           <div className="mt-6 flex items-center justify-center md:hidden">
             <div className="inline-flex items-center gap-4 rounded-full bg-black/40 px-4 py-2 text-white text-sm">
@@ -241,6 +240,7 @@ export default async function Home({ searchParams }) {
               </a>
             </div>
           </div>
+
           {/* kalendar malo odvojen od naslova */}
           <div className="mt-6">
             <CalendarGrid
