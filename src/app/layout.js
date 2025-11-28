@@ -29,7 +29,7 @@ export const metadata = {
     siteName: "Meridianbet",
     images: [
       {
-        url: "https://cloud.merbet.com/Preview-image/callendar-universal.png",
+        url: "https://cloud.merbet.com/Preview-image/calendar-universal.png",
         width: 1200,
         height: 630,
         alt: "Calendario Promocional",
