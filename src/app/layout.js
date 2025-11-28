@@ -14,35 +14,35 @@ const robotoCondensed = Roboto_Condensed({
 });
 
 export const metadata = {
-  metadataBase: new URL("https://meridianbet.bet.br"),
-  title: "Calendário de Promoções | Meridianbet",
+  metadataBase: new URL("https://meridianbet.pe"),
+  title: "Calendario Promocional | Meridianbet",
   description:
-    "Fique por dentro das ofertas diárias, descubra novas promoções e recompensas exclusivas através do Calendário de Promoções da Meridianbet.",
+    "Mantente al tanto de las ofertas diarias, descubre nuevas promociones y disfruta de recompensas exclusivas con el Calendario Promocional de Meridianbet.",
   alternates: {
     canonical: "/calendario",
   },
   openGraph: {
-    title: "Calendário de Promoções | Meridianbet",
+    title: "Calendario Promocional | Meridianbet",
     description:
-      "Fique por dentro das ofertas diárias, descubra novas promoções e recompensas exclusivas através do Calendário de Promoções da Meridianbet.",
+      "Mantente al tanto de las ofertas diarias, descubre nuevas promociones y disfruta de recompensas exclusivas con el Calendario Promocional de Meridianbet.",
     url: "/calendario",
     siteName: "Meridianbet",
     images: [
       {
-        url: "https://cloud.merbet.com/Preview-image/callendar-brazil_1.png",
+        url: "https://cloud.merbet.com/Preview-image/callendar-universal.png",
         width: 1200,
         height: 630,
-        alt: "Calendário de Promoções",
+        alt: "Calendario Promocional",
       },
     ],
-    locale: "pt_BR",
+    locale: "es_PE",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Calendário de Promoções | Meridianbet",
+    title: "Calendario Promocional | Meridianbet",
     description:
-      "Fique por dentro das ofertas diárias, descubra novas promoções e recompensas exclusivas através do Calendário de Promoções da Meridianbet.",
+      "Mantente al tanto de las ofertas diarias, descubre nuevas promociones y disfruta de recompensas exclusivas con el Calendario Promocional de Meridianbet.",
     images: ["https://cloud.merbet.com/Preview-image/callendar-brazil_1.png"],
   },
   robots: {
@@ -53,6 +53,7 @@ export const metadata = {
     icon: "/src/app/favicon.ico",
   },
 };
+
 
 export default function RootLayout({ children }) {
   return (
