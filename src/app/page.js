@@ -164,12 +164,13 @@ export default async function Home({ searchParams }) {
     <>
       {/* TOP HEADER BAR – crveni, logo levo, lang switcher desno */}
       <header className="w-full bg-[linear-gradient(90deg,#A6080E_0%,#D11101_100%)] px-4 md:px-8 py-2 flex items-center justify-between">
-        <img
-          src="./img/logo.svg"
-          alt="Meridianbet"
-          className="h-6 md:h-7 w-auto"
-        />
-
+        <a href="https://meridianbet.pe/" target="_blank">
+          <img
+            src="./img/logo.svg"
+            alt="Meridianbet"
+            className="h-6 md:h-7 w-auto"
+          />
+        </a>
         {/* desna strana: desktop flag dropdown + mobile text switcher */}
         <div className="flex items-center gap-2">
           <LangSwitcher
