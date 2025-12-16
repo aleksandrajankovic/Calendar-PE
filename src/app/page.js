@@ -192,7 +192,7 @@ export default async function Home({ searchParams }) {
           overflow-hidden         
           md:overflow-auto   
           flex
-          justify-center md:justify-start   /* centar na mobilu, levo na desktopu */
+          justify-center md:justify-start
         "
         style={{ backgroundImage: `url("${bgImageUrl}")` }}
       >
@@ -204,11 +204,11 @@ export default async function Home({ searchParams }) {
             px-4 sm:px-6 md:px-10 lg:px-16
             pt-4 pb-4        
             md:pt-6 md:pb-10
-            mx-auto md:mx-0 md:mr-auto   /* mobilno centrira, na desktopu levo */
+            mx-auto md:mx-0 md:mr-auto 
           "
         >
           <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white md:text-left text-center">
-            {lang === "es" ? "Calendario Promocional" : "Promotion Calendar"}
+            {lang === "es" ? "Calendario Promocional 1" : "Promotion Calendar"}
           </h1>
 
           {isAdmin && (
