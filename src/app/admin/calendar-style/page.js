@@ -1,3 +1,4 @@
+// src/app/admin/calendar-style/page.jsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -7,9 +8,11 @@ import ImageGalleryModal from "../components/ImageGalleryModal";
 
 export default function CalendarStyleAdminPage() {
   const [bgUrl, setBgUrl] = useState("/img/bg-calendar.png");
+  const [bgUrlMobile, setBgUrlMobile] = useState("/img/bg-calendar-mobile.png");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
+  const [isMobilePicker, setIsMobilePicker] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -17,10 +20,11 @@ export default function CalendarStyleAdminPage() {
       .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
       .then((data) => {
         setBgUrl(data.bgImageUrl || "/img/bg-calendar.png");
+        setBgUrlMobile(
+          data.bgImageUrlMobile || "/img/bg-calendar-mobile.png"
+        );
       })
-      .catch(() =>
-        toast.error("Ne mogu da učitam podešavanja pozadine kalendara.")
-      )
+      .catch(() => toast.error("Error!"))
       .finally(() => setLoading(false));
   }, []);
 
@@ -30,7 +34,10 @@ export default function CalendarStyleAdminPage() {
       const res = await fetch("/api/calendar-settings", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ bgImageUrl: bgUrl }),
+        body: JSON.stringify({
+          bgImageUrl: bgUrl,
+          bgImageUrlMobile: bgUrlMobile,
+        }),
       });
       if (!res.ok) {
         const t = await res.text().catch(() => "");
@@ -38,6 +45,9 @@ export default function CalendarStyleAdminPage() {
       }
       const data = await res.json();
       setBgUrl(data.bgImageUrl || "/img/bg-calendar.png");
+      setBgUrlMobile(
+        data.bgImageUrlMobile || "/img/bg-calendar-mobile.png"
+      );
       toast.success("Calendar background updated.");
     } catch (e) {
       toast.error(`Error: ${e.message || "Saving failed."}`);
@@ -53,7 +63,7 @@ export default function CalendarStyleAdminPage() {
           Backoffice - Calendar Background
         </h1>
         <p className="text-sm text-neutral-500">
-          Set background image for the promotion calendar.
+          Set desktop and mobile background images for the promo calendar.
         </p>
       </div>
 
@@ -61,11 +71,11 @@ export default function CalendarStyleAdminPage() {
         {loading ? (
           <div className="p-4 text-sm">Loading…</div>
         ) : (
-          <div className="p-4 space-y-4">
-            {/* URL input + gallery button */}
+          <div className="p-4 space-y-6">
+            {/* DESKTOP BG */}
             <div>
               <label className="block text-sm text-neutral-800 mb-1">
-                Background image URL
+                Desktop background image URL
               </label>
               <div className="flex flex-wrap items-center gap-3">
                 <input
@@ -76,24 +86,58 @@ export default function CalendarStyleAdminPage() {
                 />
                 <button
                   type="button"
-                  onClick={() => setShowGallery(true)}
+                  onClick={() => {
+                    setIsMobilePicker(false);
+                    setShowGallery(true);
+                  }}
                   className="shrink-0 font-condensed inline-flex items-center justify-center px-4 py-[10px] rounded bg-[#1F2933] text-white text-xs hover:brightness-110 whitespace-nowrap"
                 >
                   Choose from gallery
                 </button>
               </div>
-            </div>
-
-            {/* Preview */}
-            <div>
-              <span className="block text-sm text-neutral-800 mb-1">
-                Preview
-              </span>
-              <div className="border border-neutral-200 rounded-lg overflow-hidden max-w-[600px] aspect-[16/9] bg-black/40">
+              <div className="mt-3 border border-neutral-200 rounded-lg overflow-hidden max-w-[600px] aspect-[16/9] bg-black/40">
                 {bgUrl ? (
                   <img
                     src={bgUrl}
-                    alt="calendar background preview"
+                    alt="calendar background preview desktop"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-xs text-neutral-500">
+                    No background set
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* MOBILE BG */}
+            <div>
+              <label className="block text-sm text-neutral-800 mb-1">
+                Mobile background image URL
+              </label>
+              <div className="flex flex-wrap items-center gap-3">
+                <input
+                  className="flex-1 min-w-0 border border-[#D0D0D0] rounded px-2.5 py-1.5 text-sm"
+                  value={bgUrlMobile}
+                  onChange={(e) => setBgUrlMobile(e.target.value)}
+                  placeholder="/img/bg-calendar-mobile.png"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMobilePicker(true);
+                    setShowGallery(true);
+                  }}
+                  className="shrink-0 font-condensed inline-flex items-center justify-center px-4 py-[10px] rounded bg-[#1F2933] text-white text-xs hover:brightness-110 whitespace-nowrap"
+                >
+                  Choose from gallery
+                </button>
+              </div>
+              <div className="mt-3 border border-neutral-200 rounded-lg overflow-hidden max-w-[320px] aspect-[9/16] bg-black/40">
+                {bgUrlMobile ? (
+                  <img
+                    src={bgUrlMobile}
+                    alt="calendar background preview mobile"
                     className="w-full h-full object-cover"
                   />
                 ) : (
@@ -122,7 +166,8 @@ export default function CalendarStyleAdminPage() {
       {showGallery && (
         <ImageGalleryModal
           onSelect={(url) => {
-            setBgUrl(url);
+            if (isMobilePicker) setBgUrlMobile(url);
+            else setBgUrl(url);
             setShowGallery(false);
           }}
           onClose={() => setShowGallery(false)}

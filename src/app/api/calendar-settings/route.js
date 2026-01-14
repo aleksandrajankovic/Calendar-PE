@@ -15,8 +15,11 @@ export async function GET(req) {
   if (!adminId) return new Response("unauthorized", { status: 401 });
 
   const row = await prisma.calendarSettings.findFirst();
+
   return Response.json({
     bgImageUrl: row?.bgImageUrl || "/img/bg-calendar.png",
+
+    bgImageUrlMobile: row?.bgImageUrlMobile || "/img/bg-calendar-mobile.png",
   });
 }
 
@@ -26,17 +29,22 @@ export async function PUT(req) {
   if (!adminId) return new Response("unauthorized", { status: 401 });
 
   const body = await req.json().catch(() => ({}));
-  const raw = (body.bgImageUrl || "").trim();
 
-  const bgImageUrl = raw || null; // ako je prazno → null (pada na default)
+  const rawDesktop = (body.bgImageUrl || "").trim();
+  const rawMobile = (body.bgImageUrlMobile || "").trim();
+
+  const bgImageUrl = rawDesktop || null;        
+  const bgImageUrlMobile = rawMobile || null; 
 
   const row = await prisma.calendarSettings.upsert({
     where: { id: 1 },
-    update: { bgImageUrl },
-    create: { id: 1, bgImageUrl },
+    update: { bgImageUrl, bgImageUrlMobile },
+    create: { id: 1, bgImageUrl, bgImageUrlMobile },
   });
 
   return Response.json({
     bgImageUrl: row.bgImageUrl || "/img/bg-calendar.png",
+    bgImageUrlMobile:
+      row.bgImageUrlMobile || "/img/bg-calendar-mobile.png",
   });
 }

@@ -157,6 +157,7 @@ export default async function Home({ searchParams }) {
 
   // background za kalendar
   const bgImageUrl = calendarSettings?.bgImageUrl || "/img/bg-calendar.png";
+  const bgImageUrlMobile = calendarSettings?.bgImageUrlMobile || bgImageUrl;
 
   // Pagination for months
   const p = prevYM(year, month);
@@ -186,19 +187,23 @@ export default async function Home({ searchParams }) {
       </header>
 
       {/* MAIN CONTENT */}
-      <main
-        className="
-          w-full
-          bg-no-repeat bg-cover bg-center
-          calendar-bg
-          min-h-[100dvh]        
-          overflow-hidden         
-          md:overflow-auto   
-          flex
-          justify-center md:justify-start
-        "
-        style={{ backgroundImage: `url("${bgImageUrl}")` }}
-      >
+    
+        <main
+          className="
+      relative z-0 w-full flex-1
+      bg-no-repeat bg-cover bg-center calendar-bg
+      overflow-hidden md:overflow-auto
+      flex justify-center md:justify-start
+    "
+          style={{ backgroundImage: `url("${bgImageUrl}")` }}
+        >
+          {/* MOBILE BG */}
+          <div
+            className="pointer-events-none absolute inset-0 md:hidden bg-no-repeat bg-cover bg-center -z-10 calendar-mobile-bg"
+            style={{
+              backgroundImage: `url("${bgImageUrlMobile}")`,
+            }}
+          />
         <SnowOverlay />
         <div
           className="
