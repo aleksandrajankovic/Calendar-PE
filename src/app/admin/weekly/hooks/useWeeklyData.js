@@ -55,6 +55,7 @@ export function useWeeklyData() {
         image: payload.image ?? "",
         icon: payload.icon ?? "",
         active: !!payload.active,
+        scratch: !!payload.scratch,
         buttonColor: payload.buttonColor ?? "green",
 
         translations: payload.translations || null,

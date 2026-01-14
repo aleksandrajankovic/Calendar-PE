@@ -38,7 +38,7 @@ export default function SpecialEditor({ initial, onCancel, onSaved }) {
     const m = initial?.month ?? now.getMonth(); // 0..11
     const d = initial?.day ?? now.getDate();
 
-    const baseTranslations = initial?.translations || {};
+    const baseTranslations = { ...(initial?.translations || {}) };
     const mainLang = LANGS[0].code; // "pt"
 
     if (!baseTranslations[mainLang]) {
@@ -61,7 +61,7 @@ export default function SpecialEditor({ initial, onCancel, onSaved }) {
       icon: initial?.icon ?? "",
       active: initial?.active ?? true,
       buttonColor: initial?.buttonColor ?? "green",
-
+      scratch: !!initial?.scratch,
       translations: baseTranslations,
 
       // NOVO: category
@@ -153,6 +153,7 @@ export default function SpecialEditor({ initial, onCancel, onSaved }) {
         rich: mainT.rich || null,
         richHtml: mainT.richHtml || "",
         category: form.category || "ALL",
+        scratch: !!form.scratch,
       };
 
       const res = await fetch(url, {
@@ -480,6 +481,17 @@ export default function SpecialEditor({ initial, onCancel, onSaved }) {
               }}
             />
           </div>
+        </div>
+        {/* Scratch toggle */}
+        <div className="mt-3">
+          <label className="flex items-center gap-2 text-sm text-neutral-800">
+            <input
+              type="checkbox"
+              checked={!!form.scratch}
+              onChange={(e) => set("scratch", e.target.checked)}
+            />
+            Enable scratch card (user must scratch to reveal)
+          </label>
         </div>
       </div>
     </>

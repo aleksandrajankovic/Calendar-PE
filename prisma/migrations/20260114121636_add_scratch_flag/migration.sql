@@ -1,0 +1,11 @@
+-- AlterTable
+ALTER TABLE "CalendarSettings" ADD COLUMN     "bgImageUrlMobile" TEXT;
+
+-- AlterTable
+ALTER TABLE "SpecialPromotion" ADD COLUMN     "scratch" BOOLEAN NOT NULL DEFAULT false;
+
+-- AlterTable
+ALTER TABLE "WeeklyPlan" ADD COLUMN     "scratch" BOOLEAN NOT NULL DEFAULT false;
+
+-- AlterTable
+ALTER TABLE "WeeklyPromotion" ADD COLUMN     "scratch" BOOLEAN NOT NULL DEFAULT false;

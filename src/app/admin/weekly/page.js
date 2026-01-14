@@ -35,6 +35,7 @@ export default function GlobalWeeklyPage() {
         rich: [],
         richHtml: [],
         active: true,
+         scratch: false,
         buttonColor: "green",
         category: "ALL",
       }

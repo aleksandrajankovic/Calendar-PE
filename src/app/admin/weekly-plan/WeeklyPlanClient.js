@@ -52,6 +52,7 @@ export default function WeeklyPlanAdmin() {
         button: "",
         icon: "",
         active: true,
+        scratch: false,
         rich: null,
         richHtml: null,
         buttonColor: "green",
@@ -71,6 +72,7 @@ export default function WeeklyPlanAdmin() {
       year,
       month,
       active: !existing.active,
+      scratch: !!existing.scratch, 
     });
   }
 

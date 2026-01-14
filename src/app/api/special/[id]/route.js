@@ -1,10 +1,7 @@
-// src/app/api/special/[id]/route.js
+// app/api/special/[id]/route.js
 export const runtime = "nodejs";
 import prisma from "@/lib/db";
 
-const DEFAULT_LANG = "pt";
-
-// helper: pročitaj ID admina iz cookie-ja
 function getAdminIdFromCookie(req) {
   const cookieHeader = req.headers.get("cookie") || "";
   const match = cookieHeader.match(/admin_auth=(\d+)/);
@@ -12,18 +9,27 @@ function getAdminIdFromCookie(req) {
   return Number(match[1]);
 }
 
-/* ---------- PUT /api/special/:id ---------- */
-// čuvanje / kreiranje special promocije
-export async function PUT(req, { params }) {
-  // dozvoli BILO KOG ulogovanog admina
+async function getIdFromParamsOrUrl(req, paramsMaybePromise) {
+  const params = await paramsMaybePromise;
+  const raw = params?.id;
+
+  const url = new URL(req.url);
+  const parts = url.pathname.split("/").filter(Boolean);
+  const last = parts[parts.length - 1];
+
+  const idStr = raw ?? last;
+  const id = Number(idStr);
+
+  if (!Number.isFinite(id)) return null;
+  return id;
+}
+
+export async function PUT(req, ctx) {
   const adminId = getAdminIdFromCookie(req);
   if (!adminId) return new Response("unauthorized", { status: 401 });
 
-  const { id } = await params; // Next 16: params je Promise
-  const specialId = Number.parseInt(id, 10);
-  if (!Number.isInteger(specialId)) {
-    return new Response("bad id", { status: 400 });
-  }
+  const id = await getIdFromParamsOrUrl(req, ctx?.params);
+  if (!id) return new Response("bad id", { status: 400 });
 
   const body = await req.json().catch(() => ({}));
 
@@ -39,90 +45,61 @@ export async function PUT(req, { params }) {
     button,
     rich,
     richHtml,
-    translations: rawTranslations,
-    defaultLang,
+    translations,
     category,
+    scratch,
   } = body;
 
-  const translations = rawTranslations || {};
-  const mainLang = defaultLang || DEFAULT_LANG;
-  const mainT = translations[mainLang] || {};
-
-  const rawTitle = (title ?? "").trim();
-  const mainTitle = (mainT.title ?? "").trim();
-
-  if (!rawTitle && !mainTitle) {
-    return new Response("Title is required", { status: 400 });
-  }
-
-  const data = {
-    year,
-    month,
-    day,
-
-    title: mainT.title ?? title ?? "",
-    button: mainT.button ?? button ?? "",
-    link: mainT.link ?? link ?? "",
-    rich: mainT.rich ?? rich ?? null,
-    richHtml: mainT.richHtml ?? richHtml ?? null,
-
-    icon: icon ?? "",
-    active: !!active,
-    buttonColor: buttonColor || "green",
-
-    translations: Object.keys(translations).length ? translations : null,
-    category: category || "ALL",
-  };
-
-  const row = await prisma.specialPromotion.upsert({
-    where: { id: specialId },
-    update: data,
-    create: { id: specialId, ...data },
+  const updated = await prisma.specialPromotion.update({
+    where: { id },
+    data: {
+      year,
+      month,
+      day,
+      icon: icon ?? "",
+      link: link ?? "",
+      buttonColor: buttonColor ?? "green",
+      active: typeof active === "boolean" ? active : true,
+      title: title ?? "",
+      button: button ?? "",
+      rich: rich ?? null,
+      richHtml: richHtml ?? null,
+      translations: translations ?? null,
+      category: category ?? "ALL",
+      scratch: !!scratch, 
+    },
   });
 
-  return Response.json(row);
+  return Response.json(updated);
 }
 
-/* ---------- PATCH /api/special/:id ---------- */
-// toggle active
-export async function PATCH(req, { params }) {
+export async function PATCH(req, ctx) {
   const adminId = getAdminIdFromCookie(req);
   if (!adminId) return new Response("unauthorized", { status: 401 });
 
-  const { id } = await params;
-  const specialId = Number.parseInt(id, 10);
-  if (!Number.isInteger(specialId)) {
-    return new Response("bad id", { status: 400 });
-  }
+  const id = await getIdFromParamsOrUrl(req, ctx?.params);
+  if (!id) return new Response("bad id", { status: 400 });
 
   const body = await req.json().catch(() => ({}));
-  const next = Boolean(body.active);
 
-  try {
-    const row = await prisma.specialPromotion.update({
-      where: { id: specialId },
-      data: { active: next },
-    });
-    return Response.json(row);
-  } catch {
-    return new Response("not found", { status: 404 });
-  }
+  const updated = await prisma.specialPromotion.update({
+    where: { id },
+    data: {
+      ...(typeof body.active === "boolean" ? { active: body.active } : {}),
+      ...(typeof body.scratch === "boolean" ? { scratch: body.scratch } : {}),
+    },
+  });
+
+  return Response.json(updated);
 }
 
-/* ---------- DELETE /api/special/:id ---------- */
-export async function DELETE(req, { params }) {
+export async function DELETE(req, ctx) {
   const adminId = getAdminIdFromCookie(req);
   if (!adminId) return new Response("unauthorized", { status: 401 });
 
-  const { id } = await params;
-  const specialId = Number.parseInt(id, 10);
-  if (!Number.isInteger(specialId)) {
-    return new Response("bad id", { status: 400 });
-  }
+  const id = await getIdFromParamsOrUrl(req, ctx?.params);
+  if (!id) return new Response("bad id", { status: 400 });
 
-  await prisma.specialPromotion
-    .delete({ where: { id: specialId } })
-    .catch(() => {});
-
+  await prisma.specialPromotion.delete({ where: { id } });
   return new Response(null, { status: 204 });
 }

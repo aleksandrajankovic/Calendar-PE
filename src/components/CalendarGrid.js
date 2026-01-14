@@ -37,14 +37,11 @@ export default function CalendarGrid({
             data-cal-grid
           >
             {cells.map((cell) => {
-              // PREVIOUS / NEXT MONTH → uvek ghost
               if (cell.type === "prev" || cell.type === "next") {
                 return <CalendarGhostCell key={cell.key} cell={cell} />;
               }
 
               if (cell.type === "day") {
-                // FUTURE dani u TEKUĆEM mesecu:
-                // čak i ako nemaju promo, treba da budu zaključani sa lock ikonicom
                 if (cell.isFutureForUx) {
                   return (
                     <CalendarDayCell
@@ -56,12 +53,10 @@ export default function CalendarGrid({
                   );
                 }
 
-                // PROŠLI / DANAŠNJI dani BEZ promo → ghost
                 if (!cell.hasPromo) {
                   return <CalendarGhostCell key={cell.key} cell={cell} />;
                 }
 
-                // Dan sa promo → normalni day cell
                 return (
                   <CalendarDayCell
                     key={cell.key}
@@ -77,12 +72,10 @@ export default function CalendarGrid({
           </div>
         </div>
       </div>
-      {/* MOBILE STACK (<= 768) */}
       <div className="md:hidden flex justify-center min-h-[calc(100vh-200px)]">
         <CalendarMobileStack adminPreview={adminPreview} />
       </div>
-      {/* MODAL*/}
-    
+
       <div
         id="promo-modal"
         className="
@@ -93,7 +86,6 @@ export default function CalendarGrid({
     px-4
   "
       >
-        {/* sam modal / dialog */}
         <div
           id="promo-dialog"
           className="
@@ -108,7 +100,6 @@ export default function CalendarGrid({
       p-4 sm:p-6
     "
         >
-          {/* X dugme fiksirano u gornjem desnom uglu modala */}
           <button
             id="promo-close"
             className="
@@ -124,11 +115,10 @@ export default function CalendarGrid({
             ✕
           </button>
 
-          {/* sadržaj koji renderuje renderModalHTML → skroluje se unutar modala */}
           <div
             id="promo-content"
             className="
-        mt-6              
+         
         overflow-y-auto
         pr-2            
       "

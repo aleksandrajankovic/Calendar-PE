@@ -4,7 +4,6 @@ import prisma from "@/lib/db";
 
 const DEFAULT_LANG = "pt";
 
-// helper: pročitaj ID admina iz cookie-ja
 function getAdminIdFromCookie(req) {
   const cookieHeader = req.headers.get("cookie") || "";
   const match = cookieHeader.match(/admin_auth=(\d+)/);
@@ -12,7 +11,6 @@ function getAdminIdFromCookie(req) {
   return Number(match[1]);
 }
 
-// helper: dozvoli BILO KOG admina
 function requireAnyAdmin(req) {
   const adminId = getAdminIdFromCookie(req);
   if (!adminId) {
@@ -21,8 +19,6 @@ function requireAnyAdmin(req) {
   return { ok: true, adminId };
 }
 
-// GET /api/weekly-plan?year=YYYY&month=MM
-// ovo je ok da ostane public, za front
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
 
@@ -41,7 +37,6 @@ export async function GET(req) {
   return Response.json(rows);
 }
 
-// PUT /api/weekly-plan  (upsert jedne stavke)
 export async function PUT(req) {
   const { ok, status } = requireAnyAdmin(req);
   if (!ok) return new Response("unauthorized", { status });
@@ -74,6 +69,7 @@ export async function PUT(req) {
     translations: rawTranslations,
     defaultLang,
     category,
+    scratch,
   } = body;
 
   const translations = rawTranslations || {};
@@ -93,6 +89,7 @@ export async function PUT(req) {
 
     icon: icon ?? null,
     active: Boolean(active ?? true),
+    scratch: !!scratch,
     buttonColor: buttonColor || "green",
 
     translations: Object.keys(translations).length ? translations : null,
@@ -108,7 +105,6 @@ export async function PUT(req) {
   return Response.json(row);
 }
 
-// DELETE /api/weekly-plan
 export async function DELETE(req) {
   const { ok, status } = requireAnyAdmin(req);
   if (!ok) return new Response("unauthorized", { status });
@@ -130,9 +126,7 @@ export async function DELETE(req) {
     await prisma.weeklyPlan.delete({
       where: { year_month_weekday: { year, month, weekday } },
     });
-  } catch {
-    // ako ne postoji, i dalje vraćamo 204
-  }
+  } catch {}
 
   return new Response(null, { status: 204 });
 }

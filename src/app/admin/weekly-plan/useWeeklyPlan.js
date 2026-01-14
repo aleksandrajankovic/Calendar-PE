@@ -35,6 +35,7 @@ export function useWeeklyPlan(year, month) {
         richHtml: payload.richHtml ?? "",
 
         active: !!payload.active,
+        scratch: !!payload.scratch,
         icon: payload.icon ?? "",
         buttonColor: payload.buttonColor ?? "green",
 

@@ -4,7 +4,6 @@ import prisma from "@/lib/db";
 
 const DEFAULT_LANG = "pt";
 
-// helper: pročitaj ID admina iz cookie-ja
 function getAdminIdFromCookie(req) {
   const cookieHeader = req.headers.get("cookie") || "";
   const match = cookieHeader.match(/admin_auth=(\d+)/);
@@ -12,7 +11,6 @@ function getAdminIdFromCookie(req) {
   return Number(match[1]);
 }
 
-// GET /api/specials
 export async function GET(req) {
   const adminId = getAdminIdFromCookie(req);
   if (!adminId) {
@@ -24,6 +22,7 @@ export async function GET(req) {
   const safe = rows.map((r) => ({
     ...r,
     richHtml: r.richHtml ?? null,
+    scratch: !!r.scratch,
   }));
 
   return Response.json(safe);
@@ -56,6 +55,7 @@ export async function POST(req) {
     translations: rawTranslations,
     defaultLang,
     category,
+    scratch,
   } = body;
 
   const translations = rawTranslations || {};
@@ -89,6 +89,7 @@ export async function POST(req) {
 
       translations: Object.keys(translations).length ? translations : null,
       category: category || "ALL",
+      scratch: !!scratch,
     },
   });
 
