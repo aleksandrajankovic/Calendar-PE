@@ -6,10 +6,11 @@ export default function SidebarNav({ className = "", topOffsetPx = 56 }) {
   const pathname = usePathname();
 
   const items = [
-    { href: "/admin/users", label: "Users" }, 
-    { href: "/admin/weekly-plan", label: "Monthly Promotions" }, 
+    { href: "/admin/users", label: "Users" },
+    { href: "/admin/weekly-plan", label: "Monthly Promotions" },
     { href: "/admin/specials", label: "Special Promotions" },
     { href: "/admin/weekly", label: "Weekly Promotions" },
+    { href: "/admin/calendar-style", label: "Calendar Style" },
   ];
 
   return (
@@ -17,12 +18,9 @@ export default function SidebarNav({ className = "", topOffsetPx = 56 }) {
       className={
         `bg-white border-r border-neutral-200 p-0 font-[var(--font-roboto-condensed)] 
         
-        h-[calc(100vh-${topOffsetPx}px)] ` +
-        className
+        h-[calc(100vh-${topOffsetPx}px)] ` + className
       }
     >
-
-
       <nav aria-label="Sidebar">
         <ul className="text-[13px]">
           {items.map((it) => {

@@ -43,7 +43,6 @@ export default function SnowOverlay() {
             animationDuration: `${flake.duration}s`,
             fontSize: `${flake.size}px`,
             opacity: flake.opacity,
-            // prosleđujemo horizontalni pomeraj kao CSS varijablu
             "--drift": `${flake.drift}px`,
           }}
         >
