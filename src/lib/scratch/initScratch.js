@@ -37,8 +37,18 @@ export function initScratch() {
   let timer = null;
 
   function showReveal() {
-    reveal?.classList.remove("max-h-0", "opacity-0", "translate-y-2", "pointer-events-none");
-    reveal?.classList.add("max-h-[1200px]", "opacity-100", "translate-y-0", "pointer-events-auto");
+    reveal?.classList.remove(
+      "max-h-0",
+      "opacity-0",
+      "translate-y-2",
+      "pointer-events-none"
+    );
+    reveal?.classList.add(
+      "max-h-[1200px]",
+      "opacity-100",
+      "translate-y-0",
+      "pointer-events-auto"
+    );
   }
 
   function hideScratchInstant() {
@@ -139,7 +149,7 @@ export function initScratch() {
     hint1?.remove();
 
     confetti({
-      particleCount: 320, // ✅ više konfeta
+      particleCount: 320,
       spread: 80,
       startVelocity: 45,
       scalar: 1.0,

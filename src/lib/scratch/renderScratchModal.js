@@ -38,7 +38,7 @@ export function renderScratchModal({
 
   const hintText = lang === "es" ? "Raspa la tarjeta" : "Scratch the card";
   const hintText1 =
-    lang === "es" ? "para revelar tu recompensa" : "To reveal your reward";
+    lang === "es" ? "PARA REVELAR TU OFERTA DEL DÍA" : "Scratch to reveal today’s offer";
 
   const safeKey = String(shareKey || "default");
 
