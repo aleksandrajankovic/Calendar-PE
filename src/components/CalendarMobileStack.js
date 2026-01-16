@@ -148,11 +148,11 @@ export default function CalendarMobileStack({ adminPreview = false }) {
                 shadow-[0_18px_40px_rgba(0,0,0,0.7)]
                 transition
                 duration-300
-                overflow-hidden
+                
                 ${
                   locked || isGhost
                     ? "cursor-default"
-                    : "cursor-pointer active:scale-[0.98]"
+                    : "cursor-pointer active:scale-[0.98] overflow-hidden"
                 }
               `}
               style={{
