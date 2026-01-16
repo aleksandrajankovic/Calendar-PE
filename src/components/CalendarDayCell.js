@@ -26,7 +26,6 @@ export default function CalendarDayCell({ cell, lang, adminPreview }) {
 
   return (
     <div className="relative h-full w-full rounded-[12px]">
-      {/* overlay za today – ide na spoljašnji wrapper */}
       {cell.isToday && (
         <span className="pointer-events-none absolute -inset-px z-20 rounded-[12px] ring-1 ring-[#FACC01] shadow-[0_0_15px_rgba(250,204,1,0.9)]" />
       )}
