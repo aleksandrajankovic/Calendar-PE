@@ -135,6 +135,7 @@ export default function CalendarMobileStack({ adminPreview = false }) {
                 left-0
                 w-[230px] h-[257px]
                 rounded-[18px]
+                 ${locked || isGhost ? "overflow-hidden" : "overflow-visible"}
                 ${
                   isTodayActive
                     ? "border-2 border-[#FACC01] shadow-[0_0_20px_rgba(250,204,1,0.9)]"
@@ -152,7 +153,7 @@ export default function CalendarMobileStack({ adminPreview = false }) {
                 ${
                   locked || isGhost
                     ? "cursor-default"
-                    : "cursor-pointer active:scale-[0.98] overflow-hidden"
+                    : "cursor-pointer active:scale-[0.98]"
                 }
               `}
               style={{
