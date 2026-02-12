@@ -117,7 +117,7 @@ export default async function Home({ searchParams }) {
       ? reqMonth
       : now.getMonth();
 
-  // Load DB data
+
   const [weeklyDefaults, weeklyPlanRows, specialRows, calendarSettings] =
     await Promise.all([
       prisma.weeklyPromotion.findMany({ orderBy: { weekday: "asc" } }),
