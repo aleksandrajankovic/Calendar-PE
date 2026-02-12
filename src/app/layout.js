@@ -14,18 +14,18 @@ const robotoCondensed = Roboto_Condensed({
 });
 
 export const metadata = {
-  metadataBase: new URL("https://meridianbet.pe"),
+  metadataBase: new URL("https://calendario.meridianbet.pe/"),
   title: "Calendario Promocional | Meridianbet",
   description:
     "Mantente al tanto de las ofertas diarias, descubre nuevas promociones y disfruta de recompensas exclusivas con el Calendario Promocional de Meridianbet.",
   alternates: {
-    canonical: "/calendario",
+    canonical: "/",
   },
   openGraph: {
     title: "Calendario Promocional | Meridianbet",
     description:
       "Mantente al tanto de las ofertas diarias, descubre nuevas promociones y disfruta de recompensas exclusivas con el Calendario Promocional de Meridianbet.",
-    url: "/calendario",
+    url: "/",
     siteName: "Meridianbet",
     images: [
       {
