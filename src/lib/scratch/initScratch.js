@@ -27,6 +27,7 @@ export function initScratch() {
   const threshold = Number(canvas.dataset.threshold || 0.7);
   const coverUrl = canvas.dataset.cover;
   const promoKey = canvas.dataset.key || "default";
+  const theme = canvas.dataset.theme || "default";
 
   const userId = getAnonUserId();
   const storageKey = `scratch:${userId}:${promoKey}`;
@@ -148,13 +149,27 @@ export function initScratch() {
     hint?.remove();
     hint1?.remove();
 
-    confetti({
-      particleCount: 320,
-      spread: 80,
-      startVelocity: 45,
-      scalar: 1.0,
-      origin: { x: 0.5, y: 0.35 },
-    });
+    if (theme === "football") {
+      const ball = confetti.shapeFromText({ text: "⚽", scalar: 2 });
+      const base = { scalar: 2, flat: true, ticks: 400, gravity: 3.5, decay: 0.9, shapes: [ball] };
+      for (let i = 0; i < 10; i++) {
+        setTimeout(() => {
+          confetti({
+            ...base,
+            particleCount: 8 + Math.floor(Math.random() * 8),
+            spread: 50 + Math.random() * 50,
+            startVelocity: 35 + Math.random() * 25,
+            origin: { x: 0.25 + Math.random() * 0.5, y: 0.2 + Math.random() * 0.2 },
+          });
+        }, i * 80 + Math.random() * 40);
+      }
+    } else {
+      const colors = ["#ff0000", "#ffd700", "#17bb00", "#0066ff", "#ff69b4", "#ffffff"];
+      confetti({ particleCount: 80, spread: 70, startVelocity: 38, ticks: 300, origin: { x: 0.35, y: 0.35 }, colors });
+      setTimeout(() => {
+        confetti({ particleCount: 60, spread: 80, startVelocity: 32, ticks: 300, origin: { x: 0.65, y: 0.35 }, colors });
+      }, 150);
+    }
 
     showReveal();
     fullyClearCanvas();

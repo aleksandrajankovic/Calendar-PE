@@ -3,6 +3,7 @@ import CalendarDayCell from "./CalendarDayCell";
 import CalendarGhostCell from "./CalendarGhostCell";
 import CalendarInteractionsClient from "@/lib/calendarIneractionsClient";
 import CalendarMobileStack from "./CalendarMobileStack";
+import CalendarMobileVertical from "./CalendarMobileVertical";
 
 export default function CalendarGrid({
   year,
@@ -10,7 +11,8 @@ export default function CalendarGrid({
   weekly = [],
   specials = [],
   adminPreview = false,
-  lang = "pt",
+  lang = "es",
+  theme = "default",
 }) {
   const { cells, daysPayload } = buildCalendarData({
     year,
@@ -73,7 +75,10 @@ export default function CalendarGrid({
         </div>
       </div>
       <div className="md:hidden flex justify-center min-h-[calc(100vh-200px)]">
-        <CalendarMobileStack adminPreview={adminPreview} />
+        {theme === "default-horizontal"
+          ? <CalendarMobileStack adminPreview={adminPreview} />
+          : <CalendarMobileVertical adminPreview={adminPreview} />
+        }
       </div>
 
       <div
@@ -137,6 +142,7 @@ export default function CalendarGrid({
             year,
             month,
             lang,
+            theme,
           }),
         }}
       />

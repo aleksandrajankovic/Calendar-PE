@@ -1,11 +1,51 @@
 // src/app/page.js
+export const dynamic = "force-dynamic";
+
 import CalendarGrid from "@/components/CalendarGrid";
 import CalendarEnhancer from "@/components/CalendarEnhancer";
 import prisma from "@/lib/db";
 import { cookies } from "next/headers";
 import LangSwitcher from "@/components/LangSwitcher";
 import SnowAuto from "@/components/SnowAuto";
+import AdminLogoutButton from "@/components/AdminLogoutButton";
 import { notFound, redirect } from "next/navigation";
+
+const BASE_URL = "https://calendario.meridianbet.pe";
+const OG_IMAGE = "https://cloud.merbet.com/Preview-image/calendar-universal.png";
+
+const FALLBACK_META = {
+  es: { title: "Calendario Promocional | Meridianbet Perú", description: "Descubre las promociones diarias de Meridianbet Perú y aprovecha recompensas exclusivas con el Calendario Promocional." },
+  en: { title: "Promotion Calendar | Meridianbet Peru", description: "Discover daily promotions at Meridianbet Peru and take advantage of exclusive rewards with the Promotion Calendar." },
+};
+
+export async function generateMetadata({ searchParams }) {
+  const sp = await searchParams;
+  const langRaw = Array.isArray(sp?.lang) ? sp.lang[0] : sp?.lang;
+  const lang = ["es", "en"].includes(langRaw) ? langRaw : "es";
+
+  const row = await prisma.calendarSettings.findFirst();
+  const seo = row?.seoMeta?.[lang] || {};
+  const title = seo.title || FALLBACK_META[lang].title;
+  const description = seo.description || FALLBACK_META[lang].description;
+  const locale = lang === "es" ? "es_PE" : "en_US";
+
+  return {
+    metadataBase: new URL(BASE_URL),
+    title,
+    description,
+    alternates: { canonical: "/" },
+    openGraph: {
+      title, description,
+      url: "/",
+      siteName: "Meridianbet",
+      images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "Calendario Promocional" }],
+      locale,
+      type: "website",
+    },
+    twitter: { card: "summary_large_image", title, description, images: [OG_IMAGE] },
+    robots: { index: true, follow: true },
+  };
+}
 
 // -------------------------
 // HELPERS
@@ -148,7 +188,7 @@ export default async function Home({ searchParams }) {
       ? reqMonth
       : now.getMonth();
 
-  // ✅ Allow only months that have SpecialPromotion
+
   const allowedMonths = await getAllowedMonths(prisma);
 
   if (allowedMonths.length > 0) {
@@ -157,20 +197,16 @@ export default async function Home({ searchParams }) {
     const allowedSet = new Set(allowedMonths.map((x) => keyYM(x.year, x.month)));
     const requestedKey = keyYM(year, month);
 
-    // Ako je korisnik/bot uneo parametre za mesec koji nema special promo -> 404
     if (requestedHasParams && !allowedSet.has(requestedKey)) {
       notFound();
-      // alternativa (ako ne želiš 404): redirect("/")
     }
 
-    // Ako je root bez parametara, a trenutni mesec nije allowed -> redirect na najnoviji allowed mesec
     if (!requestedHasParams && !allowedSet.has(requestedKey)) {
       const latest = allowedMonths[allowedMonths.length - 1];
       redirect(`/?y=${latest.year}&m=${latest.month}&lang=${lang}`);
     }
   }
 
-  // Load DB data for requested month (only reached if allowed or no allowed months exist)
   const [weeklyDefaults, weeklyPlanRows, specialRows, calendarSettings] =
     await Promise.all([
       prisma.weeklyPromotion.findMany({ orderBy: { weekday: "asc" } }),
@@ -208,11 +244,37 @@ export default async function Home({ searchParams }) {
 
   const specials = normalizeSpecials(specialRows, lang);
 
-  // background za kalendar
-  const bgImageUrl = calendarSettings?.bgImageUrl || "/img/bg-calendar.png";
-  const bgImageUrlMobile = calendarSettings?.bgImageUrlMobile || bgImageUrl;
+  const monthBgs = calendarSettings?.monthBackgrounds || {};
+  const monthBg  = monthBgs[`${year}-${month}`] || {};
 
-  // ✅ Pagination: only through allowed months (prevents infinite crawl)
+  const bgImageUrl       = monthBg.desktop || calendarSettings?.bgImageUrl       || "/img/bg-calendar.png";
+  const bgImageUrlMobile = monthBg.mobile  || calendarSettings?.bgImageUrlMobile || bgImageUrl;
+  const theme    = monthBg.theme    || calendarSettings?.theme            || "default";
+  const logoUrl  = calendarSettings?.logoUrl || "/img/logo.svg";
+  const pos      = monthBg.position || calendarSettings?.calendarPosition || "left";
+
+  const mainJustify =
+    pos === "center" ? "md:justify-center" :
+    pos === "right"  ? "md:justify-end" :
+                       "md:justify-start";
+  const innerMargin =
+    pos === "center" ? "mx-auto" :
+    pos === "right"  ? "mx-auto md:mx-0 md:ml-auto" :
+                       "mx-auto md:mx-0 md:mr-auto";
+  const headingAlign =
+    pos === "center" ? "md:text-center" :
+    pos === "right"  ? "md:text-right" :
+                       "md:text-left";
+
+  const isMonthInactive = !!monthBg.inactive;
+
+  const globalTitles = calendarSettings?.calendarTitle || {};
+  const calendarTitle =
+    (lang === "es" ? monthBg.titleEs : monthBg.titleEn) ||
+    globalTitles[lang] ||
+    (lang === "es" ? "Calendario Promocional" : "Promotion Calendar");
+
+  // Pagination: only through allowed months (prevents infinite crawl)
   let p = null;
   let n = null;
 
@@ -244,7 +306,7 @@ export default async function Home({ searchParams }) {
         <header className="w-full bg-[linear-gradient(90deg,#A6080E_0%,#D11101_100%)] px-4 md:px-8 py-2 flex items-center justify-between">
           <a href="https://meridianbet.pe/" target="_blank" rel="noreferrer">
             <img
-              src="./img/logo.svg"
+              src={logoUrl}
               alt="Meridianbet"
               className="h-6 md:h-7 w-auto"
             />
@@ -262,12 +324,7 @@ export default async function Home({ searchParams }) {
 
         {/* MAIN CONTENT */}
         <main
-          className="
-            relative z-0 w-full flex-1
-            bg-no-repeat bg-cover bg-center calendar-bg
-            overflow-hidden md:overflow-auto
-            flex justify-center md:justify-start
-          "
+          className={`relative z-0 w-full flex-1 bg-no-repeat bg-cover bg-center calendar-bg overflow-hidden md:overflow-auto flex justify-center ${mainJustify}`}
           style={{ backgroundImage: `url("${bgImageUrl}")` }}
         >
           {/* MOBILE BG */}
@@ -278,23 +335,28 @@ export default async function Home({ searchParams }) {
 
           <SnowAuto />
 
-          <div
-            className="
-              w-full
-              max-w-6xl
-              px-4 sm:px-6 md:px-10 lg:px-16
-              pt-4 pb-4
-              md:pt-6 md:pb-10
-              mx-auto md:mx-0 md:mr-auto
-            "
-          >
-            <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white md:text-left text-center">
-              {lang === "es" ? "Calendario Promocional" : "Promotion Calendar"}
+          <div className={`relative z-10 w-full max-w-6xl px-4 sm:px-6 md:px-10 lg:px-16 pt-4 pb-4 md:pt-6 md:pb-10 ${innerMargin}`}>
+            <h1 className={`text-3xl md:text-5xl font-extrabold tracking-tight text-white text-center ${headingAlign}`}>
+              {calendarTitle}
             </h1>
 
             {isAdmin && (
-              <div className="mt-2 inline-block rounded bg-amber-500/20 text-amber-200 px-3 py-1 text-sm">
-                Admin preview
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <div className="inline-flex items-center gap-2 rounded bg-amber-500/20 text-amber-200 px-3 py-1 text-sm">
+                  <span>Admin preview</span>
+                  <a href="/admin" className="underline hover:text-white transition-colors" title="Go to dashboard">
+                    Dashboard
+                  </a>
+                  <AdminLogoutButton />
+                </div>
+                {isMonthInactive && (
+                  <div className="inline-flex items-center gap-1.5 rounded bg-red-700/40 text-red-200 border border-red-500/40 px-3 py-1 text-sm">
+                    <span>⚠ Month deactivated — not visible to users</span>
+                    <a href="/admin/calendar-style/monthly" className="underline hover:text-white transition-colors">
+                      Edit
+                    </a>
+                  </div>
+                )}
               </div>
             )}
 
@@ -349,6 +411,7 @@ export default async function Home({ searchParams }) {
                 specials={specials}
                 adminPreview={isAdmin}
                 lang={lang}
+                theme={theme}
               />
             </div>
 

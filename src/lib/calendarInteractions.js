@@ -2,7 +2,7 @@
 import { renderScratchModal } from "./scratch/renderScratchModal";
 import { initScratch } from "./scratch/initScratch";
 
-console.log("✅ calendarInteractions.js LOADED", new Date().toISOString());
+
 
 // -----------------------------
 // NORMAL MODAL (bez scratch-a)
@@ -111,7 +111,7 @@ function renderNormalModal(entry, lang = "pt") {
 // -----------------------------
 // MAIN RENDER
 // -----------------------------
-function renderModalHTML(entry, lang = "pt") {
+function renderModalHTML(entry, lang = "es", theme = "default") {
   if (!entry) {
     return lang === "pt"
       ? "<p>Sem promoções neste dia.</p>"
@@ -146,10 +146,11 @@ function renderModalHTML(entry, lang = "pt") {
       lang,
       shareKey,
       threshold: 0.7,
+      theme,
     });
   }
 
-  // ✅ Normal modal
+  // Normal modal
   return renderNormalModal(entry, lang);
 }
 
@@ -165,7 +166,8 @@ export function initCalendarInteractions(rootSelector = "#calendar-root") {
 
   const payload = JSON.parse(dataEl.textContent || "{}");
   const days = Array.isArray(payload.days) ? payload.days : [];
-  const lang = payload.lang || "pt";
+  const lang = payload.lang || "es";
+  const theme = payload.theme || "default";
 
   const modal = root.querySelector("#promo-modal");
   const content = root.querySelector("#promo-content");
@@ -199,7 +201,7 @@ export function initCalendarInteractions(rootSelector = "#calendar-root") {
   }
 
   function openModal(entry) {
-    content.innerHTML = renderModalHTML(entry, lang);
+    content.innerHTML = renderModalHTML(entry, lang, theme);
 
     modal.classList.remove("hidden");
     document.body.style.overflow = "hidden";
