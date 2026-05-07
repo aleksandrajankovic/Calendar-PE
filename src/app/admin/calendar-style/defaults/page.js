@@ -16,13 +16,10 @@ export default function DefaultSettingsPage() {
   const [bgUrlMobile, setBgUrlMobile]           = useState("");
   const [calendarPosition, setCalendarPosition] = useState("left");
   const [titleEs, setTitleEs]                   = useState("Calendario Promocional");
-  const [titleEn, setTitleEn]                   = useState("Promotion Calendar");
   const [logoUrl, setLogoUrl]                   = useState("/img/logo.svg");
   const [theme, setTheme]                       = useState("default");
-  const [seoTitleEs, setSeoTitleEs]             = useState("");
-  const [seoDescEs, setSeoDescEs]               = useState("");
-  const [seoTitleEn, setSeoTitleEn]             = useState("");
-  const [seoDescEn, setSeoDescEn]               = useState("");
+  const [seoTitle, setSeoTitle]                 = useState("");
+  const [seoDesc, setSeoDesc]                   = useState("");
   const [loading, setLoading]                   = useState(true);
   const [saving, setSaving]                     = useState(false);
   const [showGallery, setShowGallery]           = useState(false);
@@ -36,13 +33,10 @@ export default function DefaultSettingsPage() {
         setBgUrlMobile(d.bgImageUrlMobile || "/img/bg-calendar-mobile.png");
         setCalendarPosition(d.calendarPosition || "left");
         setTitleEs(d.calendarTitle?.es || "Calendario Promocional");
-        setTitleEn(d.calendarTitle?.en || "Promotion Calendar");
         setLogoUrl(d.logoUrl || "/img/logo.svg");
         setTheme(d.theme || "default");
-        setSeoTitleEs(d.seoMeta?.es?.title || "");
-        setSeoDescEs(d.seoMeta?.es?.description || "");
-        setSeoTitleEn(d.seoMeta?.en?.title || "");
-        setSeoDescEn(d.seoMeta?.en?.description || "");
+        setSeoTitle(d.seoMeta?.es?.title || "");
+        setSeoDesc(d.seoMeta?.es?.description || "");
       })
       .catch(() => toast.error("Error loading settings."))
       .finally(() => setLoading(false));
@@ -70,13 +64,10 @@ export default function DefaultSettingsPage() {
           bgImageUrl: bgUrl,
           bgImageUrlMobile: bgUrlMobile,
           calendarPosition,
-          calendarTitle: { es: titleEs, en: titleEn },
+          calendarTitle: { es: titleEs },
           logoUrl,
           theme,
-          seoMeta: {
-            es: { title: seoTitleEs, description: seoDescEs },
-            en: { title: seoTitleEn, description: seoDescEn },
-          },
+          seoMeta: { es: { title: seoTitle, description: seoDesc } },
         }),
       });
       if (!res.ok) throw new Error((await res.text().catch(() => "")) || `HTTP ${res.status}`);
@@ -85,13 +76,10 @@ export default function DefaultSettingsPage() {
       setBgUrlMobile(d.bgImageUrlMobile || "/img/bg-calendar-mobile.png");
       setCalendarPosition(d.calendarPosition || "left");
       setTitleEs(d.calendarTitle?.es || "Calendario Promocional");
-      setTitleEn(d.calendarTitle?.en || "Promotion Calendar");
       setLogoUrl(d.logoUrl || "/img/logo.svg");
       setTheme(d.theme || "default");
-      setSeoTitleEs(d.seoMeta?.es?.title || "");
-      setSeoDescEs(d.seoMeta?.es?.description || "");
-      setSeoTitleEn(d.seoMeta?.en?.title || "");
-      setSeoDescEn(d.seoMeta?.en?.description || "");
+      setSeoTitle(d.seoMeta?.es?.title || "");
+      setSeoDesc(d.seoMeta?.es?.description || "");
       toast.success("Default settings saved.");
     } catch (e) {
       toast.error(`Error: ${e.message || "Saving failed."}`);
@@ -142,36 +130,23 @@ export default function DefaultSettingsPage() {
           <AdminTableCard title="Calendar Title">
             <div className="p-4 space-y-4">
               <p className="text-sm text-neutral-500">Main heading shown above the calendar.</p>
-              <div className="grid gap-3 md:grid-cols-2">
-                <label className="block">
-                  <span className="mb-1 inline-block text-sm text-neutral-800">🇵🇪 Spanish (ES)</span>
-                  <input
-                    className="w-full border border-[#D0D0D0] rounded px-2.5 py-2 text-sm"
-                    value={titleEs}
-                    onChange={(e) => setTitleEs(e.target.value)}
-                    placeholder="Calendario Promocional"
-                  />
-                </label>
-                <label className="block">
-                  <span className="mb-1 inline-block text-sm text-neutral-800">🇬🇧 English (EN)</span>
-                  <input
-                    className="w-full border border-[#D0D0D0] rounded px-2.5 py-2 text-sm"
-                    value={titleEn}
-                    onChange={(e) => setTitleEn(e.target.value)}
-                    placeholder="Promotion Calendar"
-                  />
-                </label>
-              </div>
-              {(titleEs || titleEn) && (
-                <div className="pt-2 border-t border-neutral-100 space-y-1">
-                  {titleEs && <p className="text-2xl font-extrabold tracking-tight text-neutral-800">{titleEs}</p>}
-                  {titleEn && <p className="text-lg font-bold tracking-tight text-neutral-500">{titleEn}</p>}
+              <label className="block">
+                <input
+                  className="w-full border border-[#D0D0D0] rounded px-2.5 py-2 text-sm"
+                  value={titleEs}
+                  onChange={(e) => setTitleEs(e.target.value)}
+                  placeholder="Calendario Promocional"
+                />
+              </label>
+              {titleEs && (
+                <div className="pt-2 border-t border-neutral-100">
+                  <p className="text-2xl font-extrabold tracking-tight text-neutral-800">{titleEs}</p>
                 </div>
               )}
             </div>
           </AdminTableCard>
 
-          {/* ── CALENDAR THEME ── */}
+          {/* ── MOBILE LAYOUT ── */}
           <AdminTableCard title="Mobile Layout">
             <div className="p-4 space-y-4">
               <p className="text-sm text-neutral-500">Choose how the calendar looks on mobile devices.</p>
@@ -281,50 +256,24 @@ export default function DefaultSettingsPage() {
 
           {/* ── SEO / META ── */}
           <AdminTableCard title="SEO / Meta Tags">
-            <div className="p-4 space-y-6">
+            <div className="p-4 space-y-4">
               <p className="text-sm text-neutral-500">
                 Meta title and description used in search engines and social previews.
               </p>
-
-              <div>
-                <p className="text-sm font-medium text-neutral-800 mb-3">🇵🇪 Español (ES)</p>
-                <div className="space-y-3">
-                  <label className="block">
-                    <span className="mb-1 inline-block text-sm text-neutral-600">Meta title</span>
-                    <input className="w-full border border-[#D0D0D0] rounded px-2.5 py-2 text-sm"
-                      value={seoTitleEs} onChange={(e) => setSeoTitleEs(e.target.value)}
-                      placeholder="Calendario Promocional | Meridianbet Perú" maxLength={120} />
-                    <span className="mt-0.5 text-xs text-neutral-400">{seoTitleEs.length}/120</span>
-                  </label>
-                  <label className="block">
-                    <span className="mb-1 inline-block text-sm text-neutral-600">Meta description</span>
-                    <textarea className="w-full border border-[#D0D0D0] rounded px-2.5 py-2 text-sm resize-none"
-                      rows={3} value={seoDescEs} onChange={(e) => setSeoDescEs(e.target.value)}
-                      placeholder="Descubre las promociones diarias..." maxLength={320} />
-                    <span className="mt-0.5 text-xs text-neutral-400">{seoDescEs.length}/320</span>
-                  </label>
-                </div>
-              </div>
-
-              <div className="pt-4 border-t border-neutral-100">
-                <p className="text-sm font-medium text-neutral-800 mb-3">🇬🇧 English (EN)</p>
-                <div className="space-y-3">
-                  <label className="block">
-                    <span className="mb-1 inline-block text-sm text-neutral-600">Meta title</span>
-                    <input className="w-full border border-[#D0D0D0] rounded px-2.5 py-2 text-sm"
-                      value={seoTitleEn} onChange={(e) => setSeoTitleEn(e.target.value)}
-                      placeholder="Promotion Calendar | Meridianbet Peru" maxLength={120} />
-                    <span className="mt-0.5 text-xs text-neutral-400">{seoTitleEn.length}/120</span>
-                  </label>
-                  <label className="block">
-                    <span className="mb-1 inline-block text-sm text-neutral-600">Meta description</span>
-                    <textarea className="w-full border border-[#D0D0D0] rounded px-2.5 py-2 text-sm resize-none"
-                      rows={3} value={seoDescEn} onChange={(e) => setSeoDescEn(e.target.value)}
-                      placeholder="Discover daily promotions..." maxLength={320} />
-                    <span className="mt-0.5 text-xs text-neutral-400">{seoDescEn.length}/320</span>
-                  </label>
-                </div>
-              </div>
+              <label className="block">
+                <span className="mb-1 inline-block text-sm text-neutral-600">Meta title</span>
+                <input className="w-full border border-[#D0D0D0] rounded px-2.5 py-2 text-sm"
+                  value={seoTitle} onChange={(e) => setSeoTitle(e.target.value)}
+                  placeholder="Calendario Promocional | Meridianbet Perú" maxLength={120} />
+                <span className="mt-0.5 text-xs text-neutral-400">{seoTitle.length}/120</span>
+              </label>
+              <label className="block">
+                <span className="mb-1 inline-block text-sm text-neutral-600">Meta description</span>
+                <textarea className="w-full border border-[#D0D0D0] rounded px-2.5 py-2 text-sm resize-none"
+                  rows={3} value={seoDesc} onChange={(e) => setSeoDesc(e.target.value)}
+                  placeholder="Descubre las promociones diarias..." maxLength={320} />
+                <span className="mt-0.5 text-xs text-neutral-400">{seoDesc.length}/320</span>
+              </label>
             </div>
           </AdminTableCard>
 

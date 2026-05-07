@@ -4,11 +4,13 @@ export const dynamic = "force-dynamic";
 import CalendarGrid from "@/components/CalendarGrid";
 import CalendarEnhancer from "@/components/CalendarEnhancer";
 import prisma from "@/lib/db";
+import { verifyToken } from "@/lib/auth";
 import { cookies } from "next/headers";
 import LangSwitcher from "@/components/LangSwitcher";
 import SnowAuto from "@/components/SnowAuto";
 import AdminLogoutButton from "@/components/AdminLogoutButton";
 import { notFound, redirect } from "next/navigation";
+import { withRetry } from "@/lib/withRetry";
 
 const BASE_URL = "https://calendario.meridianbet.pe";
 const OG_IMAGE = "https://cloud.merbet.com/Preview-image/calendar-universal.png";
@@ -18,16 +20,11 @@ const FALLBACK_META = {
   en: { title: "Promotion Calendar | Meridianbet Peru", description: "Discover daily promotions at Meridianbet Peru and take advantage of exclusive rewards with the Promotion Calendar." },
 };
 
-export async function generateMetadata({ searchParams }) {
-  const sp = await searchParams;
-  const langRaw = Array.isArray(sp?.lang) ? sp.lang[0] : sp?.lang;
-  const lang = ["es", "en"].includes(langRaw) ? langRaw : "es";
-
+export async function generateMetadata() {
   const row = await prisma.calendarSettings.findFirst();
-  const seo = row?.seoMeta?.[lang] || {};
-  const title = seo.title || FALLBACK_META[lang].title;
-  const description = seo.description || FALLBACK_META[lang].description;
-  const locale = lang === "es" ? "es_PE" : "en_US";
+  const seo = row?.seoMeta?.es || {};
+  const title = seo.title || FALLBACK_META.es.title;
+  const description = seo.description || FALLBACK_META.es.description;
 
   return {
     metadataBase: new URL(BASE_URL),
@@ -39,7 +36,7 @@ export async function generateMetadata({ searchParams }) {
       url: "/",
       siteName: "Meridianbet",
       images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "Calendario Promocional" }],
-      locale,
+      locale: "es_PE",
       type: "website",
     },
     twitter: { card: "summary_large_image", title, description, images: [OG_IMAGE] },
@@ -81,26 +78,6 @@ function getTextFromTranslations(row, lang) {
   };
 }
 
-function normWeeklyRows(rows = [], lang) {
-  const out = Array(7).fill(null);
-  for (const r of rows) {
-    if (typeof r.weekday === "number" && r.weekday >= 0 && r.weekday <= 6) {
-      const t = getTextFromTranslations(r, lang);
-      out[r.weekday] = {
-        title: t.title,
-        icon: r.icon || "",
-        richHtml: t.richHtml,
-        link: t.link,
-        button: t.button,
-        active: !!r.active,
-        buttonColor: r.buttonColor || "green",
-        category: r.category || "ALL",
-        scratch: !!r.scratch,
-      };
-    }
-  }
-  return out;
-}
 
 function normalizeSpecials(rows = [], lang) {
   return rows.map((r) => {
@@ -168,16 +145,17 @@ export default async function Home({ searchParams }) {
 
   const cookieStore = await cookies();
   const adminCookie = cookieStore.get("admin_auth");
-  const isAdmin = !!adminCookie?.value;
+  const adminSession = adminCookie?.value
+    ? await verifyToken(adminCookie.value)
+    : null;
+  const isAdmin = !!adminSession;
 
   const now = new Date();
 
   const yRaw = getParam(sp, "y");
   const mRaw = getParam(sp, "m");
-  const langRaw = getParam(sp, "lang");
-
-  const ALLOWED_LANGS = ["es", "en"];
-  const lang = ALLOWED_LANGS.includes(langRaw) ? langRaw : "es";
+  const ALLOWED_LANGS = ["es"];
+  const lang = "es";
 
   const reqYear = Number.parseInt(yRaw ?? "", 10);
   const reqMonth = Number.parseInt(mRaw ?? "", 10);
@@ -189,7 +167,7 @@ export default async function Home({ searchParams }) {
       : now.getMonth();
 
 
-  const allowedMonths = await getAllowedMonths(prisma);
+  const allowedMonths = await withRetry(() => getAllowedMonths(prisma));
 
   if (allowedMonths.length > 0) {
     const requestedHasParams = yRaw != null || mRaw != null;
@@ -207,9 +185,8 @@ export default async function Home({ searchParams }) {
     }
   }
 
-  const [weeklyDefaults, weeklyPlanRows, specialRows, calendarSettings] =
-    await Promise.all([
-      prisma.weeklyPromotion.findMany({ orderBy: { weekday: "asc" } }),
+  const [weeklyPlanRows, specialRows, calendarSettings] =
+    await withRetry(() => Promise.all([
       prisma.weeklyPlan.findMany({
         where: { year, month },
         orderBy: { weekday: "asc" },
@@ -219,28 +196,14 @@ export default async function Home({ searchParams }) {
         orderBy: [{ day: "asc" }],
       }),
       prisma.calendarSettings.findFirst(),
-    ]);
+    ]));
 
-  const defaults = normWeeklyRows(weeklyDefaults, lang);
-  const planned = normWeeklyRows(weeklyPlanRows, lang);
-
-  const weeklyRaw = Array.from(
-    { length: 7 },
-    (_, i) =>
-      planned[i] ??
-      defaults[i] ?? {
-        title: "",
-        icon: "",
-        richHtml: null,
-        link: "#",
-        button: "",
-        active: false,
-        buttonColor: "green",
-        category: "ALL",
-        scratch: false,
-      }
-  );
-  const weekly = weeklyRaw;
+  const weekly = Array.from({ length: 7 }, (_, i) => {
+    const r = weeklyPlanRows.find((x) => x.weekday === i);
+    if (!r) return { title: "", icon: "", richHtml: null, link: "#", button: "", active: false, buttonColor: "green", category: "ALL", scratch: false };
+    const t = getTextFromTranslations(r, lang);
+    return { title: t.title, icon: r.icon || "", richHtml: t.richHtml, link: t.link, button: t.button, active: !!r.active, buttonColor: r.buttonColor || "green", category: r.category || "ALL", scratch: !!r.scratch };
+  });
 
   const specials = normalizeSpecials(specialRows, lang);
 
@@ -270,7 +233,7 @@ export default async function Home({ searchParams }) {
 
   const globalTitles = calendarSettings?.calendarTitle || {};
   const calendarTitle =
-    (lang === "es" ? monthBg.titleEs : monthBg.titleEn) ||
+    monthBg.titleEs ||
     globalTitles[lang] ||
     (lang === "es" ? "Calendario Promocional" : "Promotion Calendar");
 
@@ -296,29 +259,19 @@ export default async function Home({ searchParams }) {
     if (!obj) return "#";
     const yy = obj.year ?? obj.y;
     const mm = obj.month ?? obj.m;
-    return `/?y=${yy}&m=${mm}&lang=${lang}`;
+    return `/?y=${yy}&m=${mm}`;
   };
 
   return (
     <>
       <div className="min-h-[100dvh] flex flex-col overflow-hidden">
-        {/* TOP HEADER BAR – crveni, logo levo, lang switcher desno */}
-        <header className="w-full bg-[linear-gradient(90deg,#A6080E_0%,#D11101_100%)] px-4 md:px-8 py-2 flex items-center justify-between">
-          <a href="https://meridianbet.pe/" target="_blank" rel="noreferrer">
-            <img
-              src={logoUrl}
-              alt="Meridianbet"
-              className="h-6 md:h-7 w-auto"
-            />
+        <header className="absolute inset-x-0 top-0 z-20 flex items-center px-4 py-6 md:px-16 md:py-7">
+          <div className="flex-1" />
+          <a href="https://meridianbet.pe/" target="_blank" rel="noreferrer" aria-label="Meridianbet main site">
+            <img src={logoUrl} alt="Meridianbet" className="h-8 md:h-10 w-auto" />
           </a>
-
-          <div className="flex items-center gap-2">
-            <LangSwitcher
-              year={year}
-              month={month}
-              lang={lang}
-              allowedLangs={ALLOWED_LANGS}
-            />
+          <div className="flex-1 flex items-center justify-end gap-3">
+            <LangSwitcher year={year} month={month} lang={lang} allowedLangs={ALLOWED_LANGS} />
           </div>
         </header>
 
@@ -335,7 +288,7 @@ export default async function Home({ searchParams }) {
 
           <SnowAuto />
 
-          <div className={`relative z-10 w-full max-w-6xl px-4 sm:px-6 md:px-10 lg:px-16 pt-4 pb-4 md:pt-6 md:pb-10 ${innerMargin}`}>
+          <div className={`relative z-10 w-full max-w-6xl px-4 sm:px-6 md:px-10 lg:px-16 pt-20 md:pt-24 pb-4 md:pb-10 ${innerMargin}`}>
             <h1 className={`text-3xl md:text-5xl font-extrabold tracking-tight text-white text-center ${headingAlign}`}>
               {calendarTitle}
             </h1>

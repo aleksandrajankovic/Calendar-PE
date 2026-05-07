@@ -18,7 +18,6 @@ const LABELS = [
 // jezici za tabove
 const LANGS = [
   { code: "es", label: "Spanish" },
-  { code: "en", label: "English" },
 ];
 
 // kategorije za promo

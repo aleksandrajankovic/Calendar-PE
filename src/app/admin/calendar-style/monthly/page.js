@@ -82,7 +82,7 @@ export default function MonthlySettingsPage() {
   const configuredKeys = useMemo(
     () => Object.keys(monthBackgrounds).filter((k) => {
       const v = monthBackgrounds[k];
-      return v?.desktop || v?.mobile || v?.position || v?.titleEs || v?.titleEn || v?.inactive || v?.theme;
+      return v?.desktop || v?.mobile || v?.position || v?.titleEs || v?.inactive || v?.theme;
     }),
     [monthBackgrounds]
   );
@@ -190,20 +190,10 @@ export default function MonthlySettingsPage() {
                 </label>
                 <div className="space-y-2">
                   <div>
-                    <span className="text-xs text-neutral-500 mb-1 block">🇵🇪 Español</span>
                     <input
                       className="w-full border border-[#D0D0D0] rounded px-2.5 py-1.5 text-sm"
                       value={currentBg.titleEs || ""}
                       onChange={(e) => setField("titleEs", e.target.value)}
-                      placeholder="Leave empty to use global title"
-                    />
-                  </div>
-                  <div>
-                    <span className="text-xs text-neutral-500 mb-1 block">🇬🇧 English</span>
-                    <input
-                      className="w-full border border-[#D0D0D0] rounded px-2.5 py-1.5 text-sm"
-                      value={currentBg.titleEn || ""}
-                      onChange={(e) => setField("titleEn", e.target.value)}
                       placeholder="Leave empty to use global title"
                     />
                   </div>
@@ -299,7 +289,7 @@ export default function MonthlySettingsPage() {
                         bg.inactive && "⚠ deactivated",
                         bg.theme === "default-horizontal" && "↔ horizontal",
                         bg.theme === "default" && "↕ vertical",
-                        (bg.titleEs || bg.titleEn) && "title",
+                        bg.titleEs && "title",
                         bg.position && `position: ${bg.position}`,
                         bg.desktop  && "desktop bg",
                         bg.mobile   && "mobile bg",

@@ -1,6 +1,7 @@
 export const runtime = "nodejs";
 import { revalidateTag } from "next/cache";
 import prisma from "@/lib/db";
+import { getAdminFromRequest } from "@/lib/auth";
 
 const VALID_THEMES = ["default", "default-horizontal"];
 const VALID_POS = ["left", "center", "right"];
@@ -12,16 +13,9 @@ const DEFAULT_SEO_META = {
   en: { title: "Promotion Calendar | Meridianbet Peru", description: "Discover daily promotions at Meridianbet Peru and take advantage of exclusive rewards with the Promotion Calendar." },
 };
 
-function getAdminIdFromCookie(req) {
-  const cookieHeader = req.headers.get("cookie") || "";
-  const match = cookieHeader.match(/admin_auth=(\d+)/);
-  if (!match) return null;
-  return Number(match[1]);
-}
-
 export async function GET(req) {
-  const adminId = getAdminIdFromCookie(req);
-  if (!adminId) return new Response("unauthorized", { status: 401 });
+  const session = await getAdminFromRequest(req);
+  if (!session) return new Response("unauthorized", { status: 401 });
 
   const row = await prisma.calendarSettings.findFirst();
   return Response.json({
@@ -37,8 +31,8 @@ export async function GET(req) {
 }
 
 export async function PUT(req) {
-  const adminId = getAdminIdFromCookie(req);
-  if (!adminId) return new Response("unauthorized", { status: 401 });
+  const session = await getAdminFromRequest(req);
+  if (!session) return new Response("unauthorized", { status: 401 });
 
   const body = await req.json().catch(() => ({}));
   const patch = {};

@@ -18,6 +18,8 @@ const LANG_META = {
 
 export default function LangSwitcher({ year, month, lang, allowedLangs }) {
   const [open, setOpen] = useState(false);
+
+  if (!allowedLangs || allowedLangs.length <= 1) return null;
   const wrapperRef = useRef(null);
 
   const activeMeta = LANG_META[lang] ?? LANG_META.pt;

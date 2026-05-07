@@ -6,7 +6,6 @@ const items = [
   { href: "/admin/users", label: "Users" },
   { href: "/admin/weekly-plan", label: "Monthly Promotions" },
   { href: "/admin/specials", label: "Special Promotions" },
-  { href: "/admin/weekly", label: "Weekly Promotions" },
   {
     href: "/admin/calendar-style",
     label: "Calendar Styling",
